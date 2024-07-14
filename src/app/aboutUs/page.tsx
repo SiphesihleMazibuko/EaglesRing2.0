@@ -16,7 +16,7 @@ const AboutUs = () => {
               <div className="mb-6">
                 <h2 className="text-2xl lg:text-3xl font-bold mb-4 text-black">Our Mission</h2>
                 <p className="text-lg lg:text-xl text-black leading-relaxed">
-                  At Eagles Ring, our mission is to bridge the gap between innovative entrepreneurs and visionary investors. We provide a platform where entrepreneurs can present their groundbreaking ideas to a panel of experienced business moguls, known as the "Eagles.” Our goal is to foster entrepreneurship and drive economic growth by facilitating access to capital and mentorship.
+                  At Eagles Ring, our mission is to bridge the gap between innovative entrepreneurs and visionary investors. We provide a platform where entrepreneurs can present their groundbreaking ideas to a panel of experienced business moguls, known as the &quot;Eagles.&quot; Our goal is to foster entrepreneurship and drive economic growth by facilitating access to capital and mentorship.
                 </p>
               </div>
               <div className='mb-6'>
