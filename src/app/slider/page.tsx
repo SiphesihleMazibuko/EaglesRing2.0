@@ -24,7 +24,7 @@ const Slider = ({ slides }) => {
             key={index}
             className="w-full flex-shrink-0 p-4 bg-gray-900 rounded-lg flex flex-col items-center justify-center"
           >
-            <img
+            <Image
               src={slide.image}
               alt={slide.title}
               className="w-full h-64 object-cover rounded-lg mb-4"
