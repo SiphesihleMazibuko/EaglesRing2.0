@@ -9,7 +9,7 @@ const ContactPage = () => {
     <div className="background-container min-h-screen">
       <Navbar />
       <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-4xl  p-8 rounded-lg shadow-lg text-white ">
+        <div className="w-full max-w-4xl p-8 rounded-lg shadow-lg text-white ">
           <h1 className="text-3xl font-bold mb-6 text-center text-black">Contact Us</h1>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="flex flex-col items-center justify-center">
@@ -22,12 +22,12 @@ const ContactPage = () => {
             </div>
             <form className="flex flex-col space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <input type="text" placeholder="First Name" className="p-3 rounded bg-neutral-50 border-solid border-2 border-yellow-700 text-white" />
-                <input type="text" placeholder="Last Name" className="p-3 rounded bg-neutral-50 border-solid border-2 border-yellow-700 text-white" />
+                <input type="text" placeholder="First Name" className="p-3 rounded bg-neutral-50 border-solid border-2 border-yellow-700 text-black" />
+                <input type="text" placeholder="Last Name" className="p-3 rounded bg-neutral-50 border-solid border-2 border-yellow-700 text-black" />
               </div>
-              <input type="email" placeholder="Email" className="p-3 rounded bg-neutral-50 border-solid border-2 border-yellow-700 text-white" />
-              <textarea placeholder="Message" className="p-3 rounded bg-neutral-50 border-solid border-2 border-yellow-700 text-white" rows="4"></textarea>
-              <Button type="submit" className="hidden md:block text-white font-bold text-sm py-2 px-8 rounded cursor-pointer transition-all ease-in-out duration-300 hover:text-[#917953] hover:bg-black hover:outline-[#917953] outline-none bg-gradient-to-r from-[#917953] to-[#CBAC7C]" >
+              <input type="email" placeholder="Email" className="p-3 rounded bg-neutral-50 border-solid border-2 border-yellow-700 text-black" />
+              <textarea placeholder="Message" className="p-3 rounded bg-neutral-50 border-solid border-2 border-yellow-700 text-black" rows={4}></textarea>
+              <Button type="submit" className="hidden md:block text-white font-bold text-sm py-2 px-8 rounded cursor-pointer transition-all ease-in-out duration-300 hover:text-[#917953] hover:bg-black hover:outline-[#917953] outline-none bg-gradient-to-r from-[#917953] to-[#CBAC7C]">
                 Send
               </Button>
             </form>
