@@ -6,6 +6,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Navbar from "../navbar/page";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export function Profile() {
   const [email, setEmail] = useState("");
@@ -30,12 +32,23 @@ export function Profile() {
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
       console.log({ email, id, company, tax, file });
+      toast.success("Profile updated successfully!");
+    } else {
+      Object.values(newErrors).forEach(error => toast.error(error));
     }
   };
+  const handleFileUpload = () => {
+    const newErrors = validate()
+      setErrors(newErrors);
+      if(Object.keys(newErrors).length === 0){
+        console.log(file);
+      }
+  }
 
   return (
     <div className="background-container min-h-screen">
       <Navbar />
+      <ToastContainer />
       <div className="flex flex-col items-center justify-center flex-grow py-10">
         <Card className="w-full max-w-3xl mx-auto">
           <CardHeader>
@@ -60,7 +73,8 @@ export function Profile() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.email && <p className="text-red-500">{errors.email}</p>}
+                {errors.email && <p className="text-destructive
+">{errors.email}</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
@@ -72,7 +86,8 @@ export function Profile() {
                   onChange={(e) => setId(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.id && <p className="text-red-500">{errors.id}</p>}
+                {errors.id && <p className="text-destructive
+">{errors.id}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="company">Company Name</Label>
@@ -82,7 +97,8 @@ export function Profile() {
                   onChange={(e) => setCompany(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.company && <p className="text-red-500">{errors.company}</p>}
+                {errors.company && <p className="text-destructive
+">{errors.company}</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
@@ -94,15 +110,17 @@ export function Profile() {
                   onChange={(e) => setTax(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.tax && <p className="text-red-500">{errors.tax}</p>}
+                {errors.tax && <p className="text-destructive
+">{errors.tax}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="documents">Upload Documents</Label>
                 <div className="flex items-center gap-2">
                   <Input id="documents" type="file" onChange={(e) => setFile(e.target.files[0])} />
-                  <Button onClick={handleSaveChanges}>Upload</Button>
+                  <Button onClick={handleFileUpload}>Upload</Button>
                 </div>
-                {errors.file && <p className="text-red-500">{errors.file}</p>}
+                {errors.file && <p className="text-destructive
+">{errors.file}</p>}
               </div>
             </div>
           </CardContent>
