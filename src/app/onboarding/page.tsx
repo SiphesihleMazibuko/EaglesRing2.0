@@ -5,11 +5,9 @@ import Eagle from "@/assets/EaglesRingLogo.png"
 import { useRouter } from "next/navigation";
 
 
-interface OnboardingProps {
-  onGetStartedClick: () => "/signup";
-}
 
-const Onboarding: React.FC<OnboardingProps> = ({ onGetStartedClick }) => {
+
+const Onboarding = () => {
   const router = useRouter();
 
   const handleSignup = () => {
@@ -87,15 +85,14 @@ const Onboarding: React.FC<OnboardingProps> = ({ onGetStartedClick }) => {
   );
 };
 
-export default Onboarding;
 
 
 function Logo(props) {
   return (
     <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
       height="24"
       viewBox="0 0 24 24"
       fill="none"
@@ -103,8 +100,9 @@ function Logo(props) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-    >
+      >
       <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
     </svg>
   );
 }
+export default Onboarding;

@@ -39,7 +39,7 @@ const Pricing = () => {
             <span className="line-through text-black">Business Pitch Guidance</span>
           </div>
         </div>
-        <Button className="w-full mt-6 bg-border">Get Started</Button>
+        <Button className="w-full mt-6 bg-border transform transition duration-300 hover:scale-105">Get Started</Button>
       </div>
 
       <div className="bg-white rounded-lg shadow-lg p-6 dark:bg-[#917953]">
@@ -76,7 +76,7 @@ const Pricing = () => {
             <span className='text-black'>Business Pitch Guidance </span>
           </div>
         </div>
-        <Button className="w-full mt-6 bg-border">Get Started</Button>
+        <Button className="w-full mt-6 bg-border transform transition duration-300 hover:scale-105">Get Started</Button>
       </div>
     </div>
   )
