@@ -11,7 +11,7 @@ type Slide = {
 
 
 
-const Slider = ( slides: { image: string | StaticImport; title: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | Promise<React.AwaitedReactNode> | null | undefined; content: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }[] ) => {
+const Slider = ( slides ) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextSlide = () => {
