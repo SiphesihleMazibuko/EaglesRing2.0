@@ -76,3 +76,23 @@
 .menu-item:hover {
   color: goldenrod;
 }
+.embla{
+  justify-items: center;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+.embla--viewport {
+  overflow: hidden;
+}
+.embla__container {
+  display: flex;
+}
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+.embla__slide img {
+  width: 80%;
+}
+

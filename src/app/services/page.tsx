@@ -6,7 +6,23 @@ import Footer from '../footer/page'
 
 
 const homepage = () => {
-  
+  const slides = [
+    { 
+      title: 'Hex Enteprise ', 
+      content: 'Corporate Meeting', 
+      image: 'https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+    { 
+      title: 'Bonday Exhibition', 
+      content: 'Sandton Convention Centre Johannesburg, South Africa', 
+      image: 'https://images.pexels.com/photos/1709003/pexels-photo-1709003.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+    { 
+      title: 'Global Business Summit', 
+      content: 'How the New US-Mexico-Canada Agreement Facilities Global Business', 
+      image: 'https://images.pexels.com/photos/716281/pexels-photo-716281.jpeg?auto=compress&cs=tinysrgb&w=600'
+    }
+  ];
 
   return (
     <section className="background-container flex flex-col items-center">
@@ -39,7 +55,9 @@ const homepage = () => {
         <div className="w-full mt-12">
   <h3 className="text-3xl font-semibold mb-4 text-center text-gray-950">Latest Business Events</h3>
   <div className="flex justify-center">
-    
+    <div className="w-4/5">
+      <Slider />
+    </div>
   </div>
 </div>
 

@@ -1,61 +1,20 @@
-"use client";
-import { StaticImport } from 'next/dist/shared/lib/get-img-props';
-import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useCallback } from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
+import Autoplay from 'embla-carousel-autoplay'
 
-
-
-
-
-const Slider  = ({ slides }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + slides.length) % slides.length);
-  };
+const Slider = () => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({loop: true}, [Autoplay({delay: 3000, stopOnMouseEnter:true, stopOnInteraction: false })])
 
   return (
-    <div className="relative w-full overflow-hidden flex justify-center items-center">
-      <div
-        className="flex transition-transform duration-500"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-      >
-        {slides.map((slide, index) => (
-          <div
-            key={index}
-            className="w-full flex-shrink-0 p-4 bg-gray-900 rounded-lg flex flex-col items-center justify-center"
-          >
-            <Image
-              src={slide.image}
-              alt={slide.title}
-              width={800}
-              height={400}
-              className="w-full h-64 object-cover rounded-lg mb-4"
-            />
-            <h4 className="text-xl font-semibold mb-2 text-center text-white">{slide.title}</h4>
-            <p className="text-center text-white">{slide.content}</p>
-            <button>Join Now</button>
-          </div>
-        ))}
+    <div className='embla'>
+    <div className="embla--viewport  mt-12 h-56" ref={emblaRef}>
+      <div className="embla__container h-full">
+        <div className="embla__slide flex items-center justify center"><img src='https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&w=600' alt='Corporate Meeting'/></div>
+        <div className="embla__slide flex items-center justify center"><img src="https://images.pexels.com/photos/1709003/pexels-photo-1709003.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Bonday Exhibition" /></div>
+        <div className="embla__slide flex items-center justify center"><img src="https://images.pexels.com/photos/716281/pexels-photo-716281.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Global Business Summit" /></div>
       </div>
-      <button
-        onClick={prevSlide}
-        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-popover-foreground text-neutral-50 p-2"
-      >
-        Prev
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-popover-foreground text-neutral-50 p-2"
-      >
-        Next
-      </button>
     </div>
-  );
-};
-
-export default Slider;
+    </div>
+  )
+}
+export default Slider
