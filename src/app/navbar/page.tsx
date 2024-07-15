@@ -2,7 +2,6 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Logo from "@/assets/Logo.png";
 import Image from "next/image";
 import { UserButton } from "@clerk/nextjs";
 
@@ -17,8 +16,10 @@ const Navbar = () => {
     <nav className="bg-neutral-950 p-4 sticky top-0 z-30 flex items-center">
       <div className="max-w-[1300px] flex items-center justify-between mx-auto w-full">
         <Image
-          src={Logo}
+          src="/Logo.png"
           alt="logo"
+          width={96}
+          height={96}
           className="w-24 h-24 cursor-pointer"
           onClick={handleImageClick}
         />

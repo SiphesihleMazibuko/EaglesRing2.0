@@ -8,19 +8,19 @@ import { Button } from "@/components/ui/button";
 import Navbar from "../navbar/page";
 
 export function Profile() {
-  const [email, setEmail] = useState("johndoe@gmail.com");
-  const [id, setId] = useState("123456789");
-  const [company, setCompany] = useState("Acme Inc");
-  const [tax, setTax] = useState("987654321");
+  const [email, setEmail] = useState("");
+  const [id, setId] = useState("");
+  const [company, setCompany] = useState("");
+  const [tax, setTax] = useState("");
   const [errors, setErrors] = useState({});
   const [file, setFile] = useState(null);
 
   const validate = () => {
     const newErrors = {};
     if (!email.includes("@")) newErrors.email = "Invalid email address";
-    if (!id.match(/^\d+$/)) newErrors.id = "ID Number must be numeric";
+    if (!id.match(/^\d{13}$/)) newErrors.id = "ID Number must be exactly 13 numeric characters";
     if (company.trim() === "") newErrors.company = "Company Name is required";
-    if (!tax.match(/^\d+$/)) newErrors.tax = "Tax Number must be numeric";
+    if (!tax.match(/^\d{13}$/)) newErrors.tax = "Tax Number must be exactly 13 numeric characters";
     if (!file) newErrors.file = "Document upload is required";
     return newErrors;
   };

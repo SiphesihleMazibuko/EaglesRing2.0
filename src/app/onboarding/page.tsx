@@ -1,8 +1,8 @@
 "use client"
 import Image from "next/image";
 import Link from "next/link";
-import bgImage from "@/assets/man.jpg";
-import Eagle from "@/assets/EaglesRingLogo.png";
+import Eagle from "@/assets/EaglesRingLogo.png"
+
 
 interface OnboardingProps {
   onGetStartedClick: () => void;
@@ -12,7 +12,13 @@ const Onboarding: React.FC<OnboardingProps> = ({ onGetStartedClick }) => {
   return (
     <div className="flex flex-col min-h-[100dvh] background-container">
       <header className="px-4 lg:px-6 h-14 flex items-center">
-        <Image src={Eagle} alt="logo" className="w-24 h-24 cursor-pointer mb-5" />
+      <Image 
+  src={Eagle} 
+  alt="logo" 
+  width={96}  
+  height={96}
+  className="w-24 h-24 cursor-pointer mb-5" 
+/>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link className="text-black text-s font-medium hover:underline underline-offset-4" href="/features">
             Features
@@ -49,7 +55,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onGetStartedClick }) => {
                   <Image
                     alt="Animated Graphic"
                     className="pb-10"
-                    src={bgImage}
+                    src="/man.jpg"
                     layout="fill"
                     objectFit="cover"
                     quality={100}
@@ -76,6 +82,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onGetStartedClick }) => {
 };
 
 export default Onboarding;
+
 
 function Logo(props) {
   return (
