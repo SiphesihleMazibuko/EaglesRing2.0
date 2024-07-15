@@ -8,11 +8,9 @@ type Slide = {
   content: string;
 };
 
-type SliderProps = {
-  slides: Slide[];
-};
 
-const Slider: React.FC<SliderProps> = ({ slides }) => {
+
+const Slider = ({ slides }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextSlide = () => {
