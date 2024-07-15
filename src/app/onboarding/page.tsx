@@ -2,13 +2,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import Eagle from "@/assets/EaglesRingLogo.png"
+import { useRouter } from "next/navigation";
 
 
 interface OnboardingProps {
-  onGetStartedClick: () => void;
+  onGetStartedClick: () => "/signup";
 }
 
 const Onboarding: React.FC<OnboardingProps> = ({ onGetStartedClick }) => {
+  const router = useRouter();
+
+  const handleSignup = () => {
+    router.push("/signup");
+  }
   return (
     <div className="flex flex-col min-h-[100dvh] background-container">
       <header className="px-4 lg:px-6 h-14 flex items-center">
@@ -44,7 +50,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onGetStartedClick }) => {
                 <div className="space-x-4 py-4">
                   <button
                     className="inline-flex h-9 items-center justify-center transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]"
-                    onClick={onGetStartedClick}
+                    onClick={handleSignup}
                   >
                     Get Started
                   </button>
