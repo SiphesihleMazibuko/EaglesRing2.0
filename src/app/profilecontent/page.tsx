@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -10,12 +11,19 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export function Profile() {
+  const { user, isLoaded } = useUser(); // Ensure to get isLoaded for better handling
   const [email, setEmail] = useState("");
   const [id, setId] = useState("");
   const [company, setCompany] = useState("");
   const [tax, setTax] = useState("");
   const [errors, setErrors] = useState({});
   const [file, setFile] = useState(null);
+
+  useEffect(() => {
+    if (isLoaded && user) { // Check if user data is loaded
+      setEmail(user.primaryEmailAddress.emailAddress);
+    }
+  }, [isLoaded, user]);
 
   const validate = () => {
     const newErrors = {};
@@ -37,12 +45,17 @@ export function Profile() {
       Object.values(newErrors).forEach(error => toast.error(error));
     }
   };
+
   const handleFileUpload = () => {
-    const newErrors = validate()
-      setErrors(newErrors);
-      if(Object.keys(newErrors).length === 0){
-        console.log(file);
-      }
+    const newErrors = validate();
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length === 0) {
+      console.log(file);
+    }
+  };
+
+  if (!isLoaded) {
+    return <div>Loading...</div>; // Or some loading indicator
   }
 
   return (
@@ -60,7 +73,7 @@ export function Profile() {
               <div className="grid gap-2">
                 <Label htmlFor="avatar">Avatar</Label>
                 <Avatar>
-                  <AvatarImage src="/placeholder-user.jpg" />
+                  <AvatarImage src={user ? user.profileImageUrl : "/placeholder-user.jpg"} />
                   <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
               </div>
@@ -73,8 +86,7 @@ export function Profile() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.email && <p className="text-destructive
-">{errors.email}</p>}
+                {errors.email && <p className="text-destructive">{errors.email}</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
@@ -86,8 +98,7 @@ export function Profile() {
                   onChange={(e) => setId(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.id && <p className="text-destructive
-">{errors.id}</p>}
+                {errors.id && <p className="text-destructive">{errors.id}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="company">Company Name</Label>
@@ -97,8 +108,7 @@ export function Profile() {
                   onChange={(e) => setCompany(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.company && <p className="text-destructive
-">{errors.company}</p>}
+                {errors.company && <p className="text-destructive">{errors.company}</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
@@ -110,8 +120,7 @@ export function Profile() {
                   onChange={(e) => setTax(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.tax && <p className="text-destructive
-">{errors.tax}</p>}
+                {errors.tax && <p className="text-destructive">{errors.tax}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="documents">Upload Documents</Label>
@@ -119,8 +128,7 @@ export function Profile() {
                   <Input id="documents" type="file" onChange={(e) => setFile(e.target.files[0])} />
                   <Button onClick={handleFileUpload} className="hover:underline">Upload</Button>
                 </div>
-                {errors.file && <p className="text-destructive
-">{errors.file}</p>}
+                {errors.file && <p className="text-destructive">{errors.file}</p>}
               </div>
             </div>
           </CardContent>
