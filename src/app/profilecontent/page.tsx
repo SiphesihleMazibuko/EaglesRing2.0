@@ -98,7 +98,7 @@ export function Profile() {
               <div className="grid gap-2">
                 <Label htmlFor="avatar">Avatar</Label>
                 <Avatar>
-                  <AvatarImage src={user ? user.profileImageUrl : "/placeholder-user.jpg"} />
+                  <AvatarImage src={user && user.imageUrl ? user.imageUrl : "/placeholder-user.jpg"} />
                   <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
               </div>
