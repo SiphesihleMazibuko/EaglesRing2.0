@@ -180,7 +180,12 @@ export function Profile() {
           </CardContent>
           <CardFooter>
             <div className="flex justify-end">
-              <Button onClick={handleSaveChanges} className="hidden md:block text-white font-bold text-sm py-2 px-8 rounded cursor-pointer transition-all ease-in-out duration-300 hover:text-[#917953] hover:bg-black hover:outline-[#917953] outline-none bg-gradient-to-r from-[#917953] to-[#CBAC7C]">Save Changes</Button>
+              <Button
+                onClick={handleSaveChanges}
+                className="text-white font-bold text-sm py-2 px-8 rounded cursor-pointer transition-all ease-in-out duration-300 hover:text-[#917953] hover:bg-black hover:outline-[#917953] outline-none bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
+              >
+                Save Changes
+              </Button>
             </div>
           </CardFooter>
         </Card>
