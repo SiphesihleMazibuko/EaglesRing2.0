@@ -73,10 +73,10 @@ const Onboarding = () => {
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-s text-gray-950">© 2024 Eagles Ring. All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-s text-gray-950 hover:underline underline-offset-4" href="#">
+          <Link className="text-s text-gray-950 hover:underline underline-offset-4" href="/terms">
             Terms of Service
           </Link>
-          <Link className="text-s text-gray-950 hover:underline underline-offset-4" href="#">
+          <Link className="text-s text-gray-950 hover:underline underline-offset-4" href="/privacypolicy">
             Privacy
           </Link>
         </nav>
