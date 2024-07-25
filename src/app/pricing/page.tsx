@@ -5,8 +5,8 @@ import BackButton from '@/components/backbutton/Button'
 
 const Pricing = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto py-12 px-4 md:px-0 background-container2">
-        
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto py-12 px-4 md:px-0 background-container">
+        <BackButton />
       <div className="bg-white rounded-lg shadow-lg p-6 dark:bg-[#917953]">
         <div className="flex items-center justify-between">
           <h3 className="text-2xl font-bold text-black">Basic Plan</h3>
@@ -81,7 +81,7 @@ const Pricing = () => {
     </div>
   )
 }
-function CheckIcon(props) {
+function CheckIcon(props: React.JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
     return (
       <svg
         {...props}
@@ -99,7 +99,7 @@ function CheckIcon(props) {
       </svg>
     )
   }
-  function XIcon(props) {
+  function XIcon(props: React.JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
     return (
       <svg
         {...props}

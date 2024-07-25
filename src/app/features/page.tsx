@@ -1,3 +1,5 @@
+"use client"
+import BackButton from '@/components/backbutton/Button'
 import Link from 'next/link'
 import React from 'react'
 
@@ -5,6 +7,7 @@ const Features = () => {
   return (
     <div className="background-container p-10 text-center">
       <h1 className="text-4xl font-bold mb-10 text-gray-800">Features</h1>
+      <BackButton />
       <div className="flex flex-wrap justify-around gap-4 mb-10">
         <div className="dark:bg-[#917953] p-6 rounded-lg shadow-lg w-64 transform transition duration-300 hover:scale-105">
           <h2 className="text-2xl font-semibold mb-2 text-gray-800">Pitch your Idea</h2>
