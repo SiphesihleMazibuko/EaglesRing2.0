@@ -18,7 +18,7 @@ export function Profile() {
   const [id, setId] = useState("");
   const [company, setCompany] = useState("");
   const [tax, setTax] = useState("");
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (isLoaded && user && user.primaryEmailAddress) { 
@@ -76,6 +76,12 @@ export function Profile() {
 
     if (valid) {
       console.log(file);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
     }
   };
 
@@ -166,7 +172,7 @@ export function Profile() {
               <div className="grid gap-2">
                 <Label htmlFor="documents">Upload Documents</Label>
                 <div className="flex items-center gap-2">
-                  <Input id="documents" type="file" onChange={(e) => setFile(e.target.files[0])} />
+                  <Input id="documents" type="file" onChange={handleFileChange} />
                   <Button onClick={handleFileUpload} className="hover:underline">Upload</Button>
                 </div>
               </div>
