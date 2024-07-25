@@ -13,6 +13,8 @@ import 'react-toastify/dist/ReactToastify.css';
 export function Profile() {
   const { user, isLoaded } = useUser(); 
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
   const [id, setId] = useState("");
   const [company, setCompany] = useState("");
   const [tax, setTax] = useState("");
@@ -20,14 +22,18 @@ export function Profile() {
   const [file, setFile] = useState(null);
 
   useEffect(() => {
-    if (isLoaded && user) { 
+    if (isLoaded && user && user.primaryEmailAddress) { 
       setEmail(user.primaryEmailAddress.emailAddress);
+      setName(user.firstName || "");
+      setSurname(user.lastName || "");
     }
   }, [isLoaded, user]);
 
   const validate = () => {
     const newErrors = {};
     if (!email.includes("@")) newErrors.email = "Invalid email address";
+    if (!name.trim()) newErrors.name = "First Name is required";
+    if (!surname.trim()) newErrors.surname = "Last Name is required";
     if (!id.match(/^\d{13}$/)) newErrors.id = "ID Number must be exactly 13 numeric characters";
     if (company.trim() === "") newErrors.company = "Company Name is required";
     if (!tax.match(/^\d{13}$/)) newErrors.tax = "Tax Number must be exactly 13 numeric characters";
@@ -39,7 +45,7 @@ export function Profile() {
     const newErrors = validate();
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
-      console.log({ email, id, company, tax, file });
+      console.log({ email, name, surname, id, company, tax, file });
       toast.success("Profile updated successfully!");
     } else {
       Object.values(newErrors).forEach(error => toast.error(error));
@@ -76,6 +82,28 @@ export function Profile() {
                   <AvatarImage src={user ? user.setProfileImage : "/placeholder-user.jpg"} />
                   <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="name">First Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-neutral-50"
+                />
+                {errors.name && <p className="text-destructive">{errors.name}</p>}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="surname">Last Name</Label>
+                <Input
+                  id="surname"
+                  type="text"
+                  value={surname}
+                  onChange={(e) => setSurname(e.target.value)}
+                  className="bg-neutral-50"
+                />
+                {errors.surname && <p className="text-destructive">{errors.surname}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
