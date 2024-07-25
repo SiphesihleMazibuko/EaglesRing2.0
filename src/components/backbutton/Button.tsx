@@ -1,7 +1,6 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ArrowLeft } from 'lucide-react';
 
 const BackButton = () => {
