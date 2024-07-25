@@ -11,7 +11,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export function Profile() {
-  const { user, isLoaded } = useUser(); // Ensure to get isLoaded for better handling
+  const { user, isLoaded } = useUser(); 
   const [email, setEmail] = useState("");
   const [id, setId] = useState("");
   const [company, setCompany] = useState("");
@@ -20,7 +20,7 @@ export function Profile() {
   const [file, setFile] = useState(null);
 
   useEffect(() => {
-    if (isLoaded && user) { // Check if user data is loaded
+    if (isLoaded && user) { 
       setEmail(user.primaryEmailAddress.emailAddress);
     }
   }, [isLoaded, user]);
@@ -55,7 +55,7 @@ export function Profile() {
   };
 
   if (!isLoaded) {
-    return <div>Loading...</div>; // Or some loading indicator
+    return <div>Loading...</div>; 
   }
 
   return (
@@ -73,7 +73,7 @@ export function Profile() {
               <div className="grid gap-2">
                 <Label htmlFor="avatar">Avatar</Label>
                 <Avatar>
-                  <AvatarImage src={user ? user.profileImageUrl : "/placeholder-user.jpg"} />
+                  <AvatarImage src={user ? user.setProfileImage : "/placeholder-user.jpg"} />
                   <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
               </div>

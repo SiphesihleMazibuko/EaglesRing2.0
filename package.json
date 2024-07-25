@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
     "@clerk/nextjs": "^5.2.2",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
     "@formkit/auto-animate": "^0.8.2",
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
@@ -27,6 +30,7 @@
     "embla-carousel-autoplay": "^8.1.6",
     "embla-carousel-react": "^8.1.6",
     "emoji-picker-react": "^4.10.0",
+    "framer-motion": "^11.3.17",
     "lottie-react": "^2.4.0",
     "lucide-react": "^0.397.0",
     "next": "14.2.4",
