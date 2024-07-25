@@ -11,9 +11,7 @@ export default function Home() {
   const { user } = useUser();
   const router = useRouter();
 
-  const handleGetStartedClick = () => {
-    setShowOnboarding(false);
-  };
+ 
   
   useEffect(() => {
     if (isSignedIn) {
@@ -31,7 +29,7 @@ export default function Home() {
   return (
     <>
       {showOnboarding ? (
-        <Onboarding onGetStartedClick={handleGetStartedClick} />
+        <Onboarding  />
       ) : (
         <>
           <SignedOut>
