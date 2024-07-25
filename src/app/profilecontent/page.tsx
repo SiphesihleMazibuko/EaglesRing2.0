@@ -18,7 +18,6 @@ export function Profile() {
   const [id, setId] = useState("");
   const [company, setCompany] = useState("");
   const [tax, setTax] = useState("");
-  const [errors, setErrors] = useState({});
   const [file, setFile] = useState(null);
 
   useEffect(() => {
@@ -29,33 +28,53 @@ export function Profile() {
     }
   }, [isLoaded, user]);
 
-  const validate = () => {
-    const newErrors = {};
-    if (!email.includes("@")) newErrors.email = "Invalid email address";
-    if (!name.trim()) newErrors.name = "First Name is required";
-    if (!surname.trim()) newErrors.surname = "Last Name is required";
-    if (!id.match(/^\d{13}$/)) newErrors.id = "ID Number must be exactly 13 numeric characters";
-    if (company.trim() === "") newErrors.company = "Company Name is required";
-    if (!tax.match(/^\d{13}$/)) newErrors.tax = "Tax Number must be exactly 13 numeric characters";
-    if (!file) newErrors.file = "Document upload is required";
-    return newErrors;
-  };
-
   const handleSaveChanges = () => {
-    const newErrors = validate();
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) {
+    let valid = true;
+
+    if (!email.includes("@")) {
+      toast.error("Invalid email address");
+      valid = false;
+    }
+    if (!name.trim()) {
+      toast.error("First Name is required");
+      valid = false;
+    }
+    if (!surname.trim()) {
+      toast.error("Last Name is required");
+      valid = false;
+    }
+    if (!id.match(/^\d{13}$/)) {
+      toast.error("ID Number must be exactly 13 numeric characters");
+      valid = false;
+    }
+    if (company.trim() === "") {
+      toast.error("Company Name is required");
+      valid = false;
+    }
+    if (!tax.match(/^\d{13}$/)) {
+      toast.error("Tax Number must be exactly 13 numeric characters");
+      valid = false;
+    }
+    if (!file) {
+      toast.error("Document upload is required");
+      valid = false;
+    }
+
+    if (valid) {
       console.log({ email, name, surname, id, company, tax, file });
       toast.success("Profile updated successfully!");
-    } else {
-      Object.values(newErrors).forEach(error => toast.error(error));
     }
   };
 
   const handleFileUpload = () => {
-    const newErrors = validate();
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) {
+    let valid = true;
+
+    if (!file) {
+      toast.error("Documents required");
+      valid = false;
+    }
+
+    if (valid) {
       console.log(file);
     }
   };
@@ -79,7 +98,7 @@ export function Profile() {
               <div className="grid gap-2">
                 <Label htmlFor="avatar">Avatar</Label>
                 <Avatar>
-                  <AvatarImage src={user ? user.setProfileImage : "/placeholder-user.jpg"} />
+                  <AvatarImage src={user ? user.profileImageUrl : "/placeholder-user.jpg"} />
                   <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
               </div>
@@ -92,7 +111,6 @@ export function Profile() {
                   onChange={(e) => setName(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.name && <p className="text-destructive">{errors.name}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="surname">Last Name</Label>
@@ -103,7 +121,6 @@ export function Profile() {
                   onChange={(e) => setSurname(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.surname && <p className="text-destructive">{errors.surname}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -114,7 +131,6 @@ export function Profile() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.email && <p className="text-destructive">{errors.email}</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
@@ -126,7 +142,6 @@ export function Profile() {
                   onChange={(e) => setId(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.id && <p className="text-destructive">{errors.id}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="company">Company Name</Label>
@@ -136,7 +151,6 @@ export function Profile() {
                   onChange={(e) => setCompany(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.company && <p className="text-destructive">{errors.company}</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
@@ -148,7 +162,6 @@ export function Profile() {
                   onChange={(e) => setTax(e.target.value)}
                   className="bg-neutral-50"
                 />
-                {errors.tax && <p className="text-destructive">{errors.tax}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="documents">Upload Documents</Label>
@@ -156,7 +169,6 @@ export function Profile() {
                   <Input id="documents" type="file" onChange={(e) => setFile(e.target.files[0])} />
                   <Button onClick={handleFileUpload} className="hover:underline">Upload</Button>
                 </div>
-                {errors.file && <p className="text-destructive">{errors.file}</p>}
               </div>
             </div>
           </CardContent>
