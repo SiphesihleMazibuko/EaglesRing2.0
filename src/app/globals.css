@@ -92,7 +92,10 @@
   flex: 0 0 100%;
   min-width: 0;
 }
-.embla__slide img {
+.embla__slide image {
   width: 80%;
+  height: 250px;
 }
+
+
 
