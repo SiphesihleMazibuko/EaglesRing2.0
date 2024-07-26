@@ -4,8 +4,8 @@ import { faTwitter, faLinkedin, faFacebook } from '@fortawesome/free-brands-svg-
 
 function Footer() {
   return (
-    <footer className="bg-neutral-950 text-neutral-50 py-8 p-2.5 mt-5 ">
-      <div className="max-w-[1300px] flex items-center justify-evenly mx-auto w-full">
+    <footer className="bg-neutral-950 text-neutral-50 py-8 p-2.5 mt-5 w-full">
+      <div className="max-w-[1300px] flex items-center justify-evenly mx-auto ">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
           <div className="flex flex-col mb-4 md:mb-0 md:mr-8">
             <h3 className="text-lg font-semibold mb-2">Connect with us</h3>
