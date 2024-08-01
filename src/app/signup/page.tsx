@@ -106,7 +106,6 @@ export default function Component() {
               value={formData.fullName}
               onChange={handleInputChange}
             />
-            {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
           </div>
           <div className="relative">
             <MailIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -118,7 +117,6 @@ export default function Component() {
               value={formData.email}
               onChange={handleInputChange}
             />
-            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
           <Select
             value={formData.userType}
@@ -132,7 +130,6 @@ export default function Component() {
               <SelectItem value="Investor" className="bg-card text-card-foreground">Investor</SelectItem>
             </SelectContent>
           </Select>
-          {errors.userType && <p className="text-red-500 text-sm">{errors.userType}</p>}
           <div className="relative">
             <Input
               name="password"
@@ -149,10 +146,8 @@ export default function Component() {
               className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <EyeOffIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
               <span className="sr-only">Toggle password visibility</span>
             </Button>
-            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
           <div className="relative">
             <Input
@@ -163,20 +158,16 @@ export default function Component() {
               value={formData.confirmPassword}
               onChange={handleInputChange}
             />
-            {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
               id="terms"
               name="termsAccepted"
               checked={formData.termsAccepted}
-              onChange={handleInputChange}
             />
             <label htmlFor="terms" className="text-sm font-medium leading-none text-card-foreground">
               I agree to the <Link href="/terms" className="text-info hover:underline">Terms & Conditions</Link>
-              {!formData.termsAccepted && <span className="text-red-500">*</span>}
             </label>
-            {errors.termsAccepted && <p className="text-red-500 text-sm">{errors.termsAccepted}</p>}
           </div>
           <Button type="submit" className="w-full mt-6 transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]">Register</Button>
         </form>

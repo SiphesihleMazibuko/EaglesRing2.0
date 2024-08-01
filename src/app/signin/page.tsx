@@ -14,14 +14,11 @@ interface FormData {
 
 export default function Page() {
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState<FormData>({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -29,8 +26,8 @@ export default function Page() {
     });
   };
 
-  const validate = () => {
-    const newErrors: { [key: string]: string } = {};
+  const validate = (): boolean => {
+    const newErrors: { email?: string; password?: string } = {};
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
     setErrors(newErrors);
@@ -41,7 +38,7 @@ export default function Page() {
     e.preventDefault();
     if (validate()) {
       toast.success("Login successful!");
-      router.push('/services')
+      router.push('/services');
     } else {
       Object.values(errors).forEach((error) => {
         toast.error(error);
