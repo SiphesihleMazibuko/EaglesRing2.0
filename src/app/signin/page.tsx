@@ -1,6 +1,6 @@
 "use client"
 import { ToastContainer, toast } from "react-toastify";
-import { useState } from "react";
+import {useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -16,7 +16,7 @@ export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -32,7 +32,7 @@ export default function Page() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (validate()) {
       toast.success("Login successful!");
@@ -96,7 +96,7 @@ export default function Page() {
   );
 }
 
-function MailIcon(props) {
+function MailIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -116,7 +116,7 @@ function MailIcon(props) {
   )
 }
 
-function EyeIcon(props) {
+function EyeIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -136,7 +136,7 @@ function EyeIcon(props) {
   )
 }
 
-function EyeOffIcon(props) {
+function EyeOffIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

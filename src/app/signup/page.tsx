@@ -22,7 +22,7 @@ export default function Component() {
   const [errors, setErrors] = useState({});
   const [avatarImage, setAvatarImage] = useState("/placeholder-user.jpg");
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: { target: { name: any; value: any; type: any; checked: any; }; }) => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
@@ -30,7 +30,7 @@ export default function Component() {
     });
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = (e: { target: { files: any[]; }; }) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -53,13 +53,13 @@ export default function Component() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (validate()) {
       toast.success("Form submitted successfully!");
     } else {
       Object.values(errors).forEach((error) => {
-        toast.error(error);
+        toast.error("Error submitting form");
       });
     }
   };
@@ -177,7 +177,7 @@ export default function Component() {
 }
 
 // Icon components for password visibility toggle
-function EyeIcon(props) {
+function EyeIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -197,7 +197,7 @@ function EyeIcon(props) {
   )
 }
 
-function EyeOffIcon(props) {
+function EyeOffIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -217,7 +217,7 @@ function EyeOffIcon(props) {
   )
 }
 
-function MailIcon(props) {
+function MailIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -237,7 +237,7 @@ function MailIcon(props) {
   )
 }
 
-function UserIcon(props) {
+function UserIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -257,7 +257,7 @@ function UserIcon(props) {
   )
 }
 
-function XIcon(props) {
+function XIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
