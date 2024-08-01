@@ -88,7 +88,7 @@ export default function Page() {
         </form>
         <div className="text-center mt-4">
           <label className="text-sm font-medium leading-none text-card-foreground">
-            Don't have an account? <Link href="/signup" className="text-info hover:underline">Register</Link>
+            Don&apos;t have an account? <Link href="/signup" className="text-info hover:underline">Register</Link>
           </label>
         </div>
       </div>
