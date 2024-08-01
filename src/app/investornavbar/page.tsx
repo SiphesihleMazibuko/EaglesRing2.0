@@ -6,7 +6,7 @@ import Image from "next/image";
 import { HiMenu, HiX } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 
-const Navbar = () => {
+const InvestorNavbar = () => {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,13 +42,8 @@ const Navbar = () => {
           <div className="flex-grow flex justify-center">
             <ul className={`md:flex items-center gap-6 list-none ${isMenuOpen ? 'block' : 'hidden'} md:block`}>
               <li>
-                <Link href="/services" className="menu-item cursor-pointer text-white hover:text-gray-300">
-                  Services
-                </Link>
-              </li>
-              <li>
-                <Link href="/chat" className="menu-item cursor-pointer text-white hover:text-gray-300">
-                  Chat
+                <Link href="/projects" className="menu-item cursor-pointer text-white hover:text-gray-300">
+                  Projects
                 </Link>
               </li>
               <li>
@@ -100,13 +95,8 @@ const Navbar = () => {
         </div>
         <ul className="flex flex-col items-center gap-4 mt-8">
           <li>
-            <Link href="/services" className="menu-item cursor-pointer text-white hover:text-gray-300">
-              Services
-            </Link>
-          </li>
-          <li>
-            <Link href="/chat" className="menu-item cursor-pointer text-white hover:text-gray-300">
-              Chat
+            <Link href="/projects" className="menu-item cursor-pointer text-white hover:text-gray-300">
+              Projects
             </Link>
           </li>
           <li>
@@ -130,4 +120,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default InvestorNavbar;

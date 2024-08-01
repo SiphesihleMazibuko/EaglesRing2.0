@@ -52,7 +52,7 @@ export default function Page() {
   return (
     <div className="flex justify-center py-12 bg-background min-h-screen">
       <ToastContainer />
-      <div className="w-full max-w-sm p-8 bg-card rounded-lg shadow-lg border border-border">
+      <div className="w-full max-w-sm p-8 bg-card rounded-lg shadow-lg border border-border h-[500px]">
         <h1 className="text-3xl font-bold text-center text-card-foreground mb-6">Login</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
