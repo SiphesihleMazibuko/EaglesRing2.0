@@ -9,8 +9,17 @@ import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+interface FormData {
+  fullName: string;
+  email: string;
+  userType: string;
+  password: string;
+  confirmPassword: string;
+  termsAccepted: boolean;
+}
+
 export default function Component() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     fullName: "",
     email: "",
     userType: "",
@@ -19,10 +28,10 @@ export default function Component() {
     termsAccepted: false,
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [avatarImage, setAvatarImage] = useState("/placeholder-user.jpg");
 
-  const handleInputChange = (e: { target: { name: any; value: any; type: any; checked: any; }; }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
@@ -30,8 +39,8 @@ export default function Component() {
     });
   };
 
-  const handleImageUpload = (e: { target: { files: any[]; }; }) => {
-    const file = e.target.files[0];
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
@@ -42,7 +51,7 @@ export default function Component() {
   };
 
   const validate = () => {
-    const newErrors = {};
+    const newErrors: { [key: string]: string } = {};
     if (!formData.fullName) newErrors.fullName = "Full Name is required";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.userType) newErrors.userType = "User type is required";
@@ -53,13 +62,13 @@ export default function Component() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validate()) {
       toast.success("Form submitted successfully!");
     } else {
       Object.values(errors).forEach((error) => {
-        toast.error("Error submitting form");
+        toast.error(error);
       });
     }
   };
@@ -97,6 +106,7 @@ export default function Component() {
               value={formData.fullName}
               onChange={handleInputChange}
             />
+            {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
           </div>
           <div className="relative">
             <MailIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -108,9 +118,9 @@ export default function Component() {
               value={formData.email}
               onChange={handleInputChange}
             />
+            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
           <Select
-            name="userType"
             value={formData.userType}
             onValueChange={(value) => setFormData({ ...formData, userType: value })}
           >
@@ -118,10 +128,11 @@ export default function Component() {
               <SelectValue placeholder="Select an option" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Entreprenuer" className="bg-card text-card-foreground">Entrepreneur</SelectItem>
+              <SelectItem value="Entrepreneur" className="bg-card text-card-foreground">Entrepreneur</SelectItem>
               <SelectItem value="Investor" className="bg-card text-card-foreground">Investor</SelectItem>
             </SelectContent>
           </Select>
+          {errors.userType && <p className="text-red-500 text-sm">{errors.userType}</p>}
           <div className="relative">
             <Input
               name="password"
@@ -141,6 +152,7 @@ export default function Component() {
               {showPassword ? <EyeOffIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
               <span className="sr-only">Toggle password visibility</span>
             </Button>
+            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
           <div className="relative">
             <Input
@@ -151,6 +163,7 @@ export default function Component() {
               value={formData.confirmPassword}
               onChange={handleInputChange}
             />
+            {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -163,11 +176,12 @@ export default function Component() {
               I agree to the <Link href="/terms" className="text-info hover:underline">Terms & Conditions</Link>
               {!formData.termsAccepted && <span className="text-red-500">*</span>}
             </label>
+            {errors.termsAccepted && <p className="text-red-500 text-sm">{errors.termsAccepted}</p>}
           </div>
           <Button type="submit" className="w-full mt-6 transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]">Register</Button>
         </form>
         <div className="text-center mt-4">
-          <label htmlFor="terms" className="text-sm font-medium leading-none text-card-foreground">
+          <label className="text-sm font-medium leading-none text-card-foreground">
             Already have an account? <Link href="/signin" className="text-info hover:underline">Login</Link>
           </label>
         </div>
@@ -177,7 +191,7 @@ export default function Component() {
 }
 
 // Icon components for password visibility toggle
-function EyeIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+function EyeIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -197,7 +211,7 @@ function EyeIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   )
 }
 
-function EyeOffIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+function EyeOffIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -217,7 +231,7 @@ function EyeOffIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   )
 }
 
-function MailIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+function MailIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -237,7 +251,7 @@ function MailIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   )
 }
 
-function UserIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+function UserIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -257,7 +271,7 @@ function UserIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   )
 }
 
-function XIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+function XIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

@@ -1,15 +1,20 @@
 "use client"
 import { ToastContainer, toast } from "react-toastify";
-import {useState } from "react";
+import {SVGProps, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 
+interface FormData {
+  email: string;
+  password: string;
+}
+
 export default function Page() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
   });
@@ -25,14 +30,14 @@ export default function Page() {
   };
 
   const validate = () => {
-    const newErrors = {};
+    const newErrors: { [key: string]: string } = {};
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validate()) {
       toast.success("Login successful!");
