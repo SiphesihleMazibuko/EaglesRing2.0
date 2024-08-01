@@ -1,13 +1,10 @@
-"use client"
-import React from 'react'
-import Navbar from '../navbar/page'
-import Slider from '../slider/page';
-import Footer from '../footer/page'
-
+"use client";
+import React from "react";
+import Navbar from "../navbar/page";
+import Slider from "../slider/page";
+import Footer from "../footer/page";
 
 const homepage = () => {
-  
-
   return (
     <section className="background-container flex flex-col items-center">
       <div className="w-full">
@@ -18,39 +15,42 @@ const homepage = () => {
           Eagles Ring, Home of Innovators
         </h2>
         <p className="text-base font-normal leading-8 text-center text-gray-950">
-          Help in building pitches | Transform your ideas into reality | Get Financial Aid | Connect with Investors all over
+          Help in building pitches | Transform your ideas into reality | Get
+          Financial Aid | Connect with Investors all over
         </p>
       </div>
       <div className="flex flex-col items-center gap-8 mt-20 w-full">
         <div className="w-full flex flex-col items-center">
-          <h3 className="text-3xl font-semibold mb-4 text-gray-950">How to Pitch an Idea to an Investor</h3>
+          <h3 className="text-3xl font-semibold mb-4 text-gray-950">
+            How to Pitch an Idea to an Investor
+          </h3>
           <div className="w-4/5">
-          <iframe
-  className="w-full aspect-video"
-  src="https://www.youtube.com/embed/XWRtG_PDRik"
-  title="How to Pitch your Startup in 3 Minutes"
-  frameBorder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
-
+            <iframe
+              className="w-full aspect-video"
+              src="https://www.youtube.com/embed/XWRtG_PDRik"
+              title="How to Pitch your Startup in 3 Minutes"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
           </div>
         </div>
         <div className="w-full mt-12">
-  <h3 className="text-3xl font-semibold mb-4 text-center text-gray-950">Latest Business Events</h3>
-  <div className="flex justify-center">
-    <div className="w-4/5">
-      <Slider />
-    </div>
-  </div>
-</div>
-
+          <h3 className="text-3xl font-semibold mb-4 text-center text-gray-950">
+            Latest Business Events
+          </h3>
+          <div className="flex justify-center">
+            <div className="w-4/5">
+              <Slider />
+            </div>
+          </div>
+        </div>
       </div>
       <div>
         <Footer />
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default homepage
+export default homepage;

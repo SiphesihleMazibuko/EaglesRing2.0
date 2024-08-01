@@ -1,33 +1,36 @@
-"use client"
+"use client";
 import Image from "next/image";
 import Link from "next/link";
-import Eagle from "@/assets/EaglesRingLogo.png"
+import Eagle from "@/assets/EaglesRingLogo.png";
 import { useRouter } from "next/navigation";
-
-
-
 
 const Onboarding = () => {
   const router = useRouter();
 
   const handleSignup = () => {
     router.push("/signup");
-  }
+  };
   return (
     <div className="flex flex-col min-h-[100dvh] background-container">
       <header className="px-4 lg:px-6 h-14 flex items-center">
-      <Image 
-  src={Eagle} 
-  alt="logo" 
-  width={96}  
-  height={96}
-  className="w-24 h-24 cursor-pointer mb-5" 
-/>
+        <Image
+          src={Eagle}
+          alt="logo"
+          width={96}
+          height={96}
+          className="w-24 h-24 cursor-pointer mb-5"
+        />
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-black text-s font-medium hover:underline underline-offset-4" href="/features">
+          <Link
+            className="text-black text-s font-medium hover:underline underline-offset-4"
+            href="/features"
+          >
             Features
           </Link>
-          <Link className="text-black text-s font-medium hover:underline underline-offset-4" href="/pricing">
+          <Link
+            className="text-black text-s font-medium hover:underline underline-offset-4"
+            href="/pricing"
+          >
             Pricing
           </Link>
         </nav>
@@ -42,7 +45,8 @@ const Onboarding = () => {
                     Streamline Your Business with Eagles Ring
                   </h1>
                   <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-950">
-                    Discover how our innovative solutions can transform your business and unlock new opportunities.
+                    Discover how our innovative solutions can transform your
+                    business and unlock new opportunities.
                   </p>
                 </div>
                 <div className="space-x-4 py-4">
@@ -71,12 +75,20 @@ const Onboarding = () => {
         </section>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-s text-gray-950">© 2024 Eagles Ring. All rights reserved.</p>
+        <p className="text-s text-gray-950">
+          © 2024 Eagles Ring. All rights reserved.
+        </p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-s text-gray-950 hover:underline underline-offset-4" href="/terms">
+          <Link
+            className="text-s text-gray-950 hover:underline underline-offset-4"
+            href="/terms"
+          >
             Terms of Service
           </Link>
-          <Link className="text-s text-gray-950 hover:underline underline-offset-4" href="/privacypolicy">
+          <Link
+            className="text-s text-gray-950 hover:underline underline-offset-4"
+            href="/privacypolicy"
+          >
             Privacy
           </Link>
         </nav>
@@ -84,8 +96,5 @@ const Onboarding = () => {
     </div>
   );
 };
-
-
-
 
 export default Onboarding;

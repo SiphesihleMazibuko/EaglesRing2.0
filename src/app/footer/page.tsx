@@ -1,6 +1,10 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTwitter, faLinkedin, faFacebook } from '@fortawesome/free-brands-svg-icons';
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faTwitter,
+  faLinkedin,
+  faFacebook,
+} from "@fortawesome/free-brands-svg-icons";
 
 function Footer() {
   return (
@@ -10,24 +14,64 @@ function Footer() {
           <div className="flex flex-col mb-4 md:mb-0 md:mr-8">
             <h3 className="text-lg font-semibold mb-2">Connect with us</h3>
             <div className="flex space-x-4">
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                <FontAwesomeIcon icon={faTwitter} className="text-2xl hover:text-blue-400" />
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Twitter"
+              >
+                <FontAwesomeIcon
+                  icon={faTwitter}
+                  className="text-2xl hover:text-blue-400"
+                />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-                <FontAwesomeIcon icon={faLinkedin} className="text-2xl hover:text-blue-600" />
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+              >
+                <FontAwesomeIcon
+                  icon={faLinkedin}
+                  className="text-2xl hover:text-blue-600"
+                />
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                <FontAwesomeIcon icon={faFacebook} className="text-2xl hover:text-blue-700" />
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+              >
+                <FontAwesomeIcon
+                  icon={faFacebook}
+                  className="text-2xl hover:text-blue-700"
+                />
               </a>
             </div>
           </div>
           <div className="flex flex-col mb-4 md:mb-0 md:mr-8 text-center md:text-left">
             <h3 className="text-lg font-semibold mb-2">Quick Links</h3>
             <ul>
-              <li><a href="/services" className="hover:underline">Home</a></li>
-              <li><a href="/aboutUs" className="hover:underline">About Us</a></li>
-              <li><a href="/chat" className="hover:underline">Chat</a></li>
-              <li><a href="/contact" className="hover:underline">Contact</a></li>
+              <li>
+                <a href="/services" className="hover:underline">
+                  Home
+                </a>
+              </li>
+              <li>
+                <a href="/aboutUs" className="hover:underline">
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a href="/chat" className="hover:underline">
+                  Chat
+                </a>
+              </li>
+              <li>
+                <a href="/contact" className="hover:underline">
+                  Contact
+                </a>
+              </li>
             </ul>
           </div>
           <div className="flex flex-col text-center md:text-right">
@@ -37,9 +81,11 @@ function Footer() {
           </div>
         </div>
       </div>
-        <div className="text-center mt-8 ">
-          <p>&copy; {new Date().getFullYear()} Your Company. All rights reserved.</p>
-        </div>
+      <div className="text-center mt-8 ">
+        <p>
+          &copy; {new Date().getFullYear()} Your Company. All rights reserved.
+        </p>
+      </div>
     </footer>
   );
 }

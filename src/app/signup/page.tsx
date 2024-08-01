@@ -1,9 +1,15 @@
-"use client"
+"use client";
 import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
@@ -56,8 +62,10 @@ export default function Component() {
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.userType) newErrors.userType = "User type is required";
     if (!formData.password) newErrors.password = "Password is required";
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
-    if (!formData.termsAccepted) newErrors.termsAccepted = "You must accept the terms and conditions";
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match";
+    if (!formData.termsAccepted)
+      newErrors.termsAccepted = "You must accept the terms and conditions";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -77,7 +85,9 @@ export default function Component() {
     <div className="flex justify-center py-12 bg-background min-h-screen">
       <ToastContainer />
       <div className="w-full max-w-sm p-8 bg-card rounded-lg shadow-lg border border-border">
-        <h1 className="text-3xl font-bold text-center text-card-foreground mb-6">Registration</h1>
+        <h1 className="text-3xl font-bold text-center text-card-foreground mb-6">
+          Registration
+        </h1>
         <div className="flex flex-col items-center mb-4">
           <Avatar>
             <AvatarImage src={avatarImage} />
@@ -120,14 +130,26 @@ export default function Component() {
           </div>
           <Select
             value={formData.userType}
-            onValueChange={(value) => setFormData({ ...formData, userType: value })}
+            onValueChange={(value) =>
+              setFormData({ ...formData, userType: value })
+            }
           >
             <SelectTrigger id="option" className="bg-card text-card-foreground">
               <SelectValue placeholder="Select an option" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Entrepreneur" className="bg-card text-card-foreground">Entrepreneur</SelectItem>
-              <SelectItem value="Investor" className="bg-card text-card-foreground">Investor</SelectItem>
+              <SelectItem
+                value="Entrepreneur"
+                className="bg-card text-card-foreground"
+              >
+                Entrepreneur
+              </SelectItem>
+              <SelectItem
+                value="Investor"
+                className="bg-card text-card-foreground"
+              >
+                Investor
+              </SelectItem>
             </SelectContent>
           </Select>
           <div className="relative">
@@ -165,15 +187,29 @@ export default function Component() {
               name="termsAccepted"
               checked={formData.termsAccepted}
             />
-            <label htmlFor="terms" className="text-sm font-medium leading-none text-card-foreground">
-              I agree to the <Link href="/terms" className="text-info hover:underline">Terms & Conditions</Link>
+            <label
+              htmlFor="terms"
+              className="text-sm font-medium leading-none text-card-foreground"
+            >
+              I agree to the{" "}
+              <Link href="/terms" className="text-info hover:underline">
+                Terms & Conditions
+              </Link>
             </label>
           </div>
-          <Button type="submit" className="w-full mt-6 transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]">Register</Button>
+          <Button
+            type="submit"
+            className="w-full mt-6 transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]"
+          >
+            Register
+          </Button>
         </form>
         <div className="text-center mt-4">
           <label className="text-sm font-medium leading-none text-card-foreground">
-            Already have an account? <Link href="/signin" className="text-info hover:underline">Login</Link>
+            Already have an account?{" "}
+            <Link href="/signin" className="text-info hover:underline">
+              Login
+            </Link>
           </label>
         </div>
       </div>
@@ -182,7 +218,9 @@ export default function Component() {
 }
 
 // Icon components for password visibility toggle
-function EyeIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
+function EyeIcon(
+  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
+) {
   return (
     <svg
       {...props}
@@ -199,10 +237,12 @@ function EyeIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>)
       <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
       <circle cx="12" cy="12" r="3" />
     </svg>
-  )
+  );
 }
 
-function EyeOffIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
+function EyeOffIcon(
+  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
+) {
   return (
     <svg
       {...props}
@@ -219,10 +259,12 @@ function EyeOffIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElemen
       <path d="M17.94 17.94a10.92 10.92 0 0 0 2.56-2.69C23 12 19 5 12 5c-1.79 0-3.5.46-5 .126" />
       <path d="M1 1l22 22" />
     </svg>
-  )
+  );
 }
 
-function MailIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
+function MailIcon(
+  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
+) {
   return (
     <svg
       {...props}
@@ -239,10 +281,12 @@ function MailIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
       <rect width="20" height="16" x="2" y="4" rx="2" />
       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
     </svg>
-  )
+  );
 }
 
-function UserIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
+function UserIcon(
+  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
+) {
   return (
     <svg
       {...props}
@@ -259,7 +303,7 @@ function UserIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
       <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
     </svg>
-  )
+  );
 }
 
 function XIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
@@ -279,5 +323,5 @@ function XIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
       <path d="M18 6 6 18" />
       <path d="m6 6 12 12" />
     </svg>
-  )
+  );
 }

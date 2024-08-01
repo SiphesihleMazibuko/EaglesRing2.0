@@ -1,6 +1,6 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import Onboarding from "./onboarding/page";
 import Services from "./services/page";
 
@@ -20,14 +20,14 @@ export default function Home() {
       setShowOnboarding(false);
     }
   }, [isSignedIn]);
-  
+
   useEffect(() => {
     if (!isSignedIn && !showOnboarding) {
       setShowOnboarding(true);
       router.push("/");
     }
   }, [isSignedIn, showOnboarding, router]);
-  
+
   const navigateToSignIn = () => {
     // Navigate to the sign-in page
     router.push("/signin");

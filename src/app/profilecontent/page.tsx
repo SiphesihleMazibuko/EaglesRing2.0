@@ -1,17 +1,24 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Navbar from "../navbar/page";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export function Profile() {
-  const { user, isLoaded } = useUser(); 
+  const { user, isLoaded } = useUser();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
@@ -21,7 +28,7 @@ export function Profile() {
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
-    if (isLoaded && user && user.primaryEmailAddress) { 
+    if (isLoaded && user && user.primaryEmailAddress) {
       setEmail(user.primaryEmailAddress.emailAddress);
       setName(user.firstName || "");
       setSurname(user.lastName || "");
@@ -86,7 +93,7 @@ export function Profile() {
   };
 
   if (!isLoaded) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
   return (
@@ -104,7 +111,13 @@ export function Profile() {
               <div className="grid gap-2">
                 <Label htmlFor="avatar">Avatar</Label>
                 <Avatar>
-                  <AvatarImage src={user && user.imageUrl ? user.imageUrl : "/placeholder-user.jpg"} />
+                  <AvatarImage
+                    src={
+                      user && user.imageUrl
+                        ? user.imageUrl
+                        : "/placeholder-user.jpg"
+                    }
+                  />
                   <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
               </div>
@@ -172,8 +185,17 @@ export function Profile() {
               <div className="grid gap-2">
                 <Label htmlFor="documents">Upload Documents</Label>
                 <div className="flex items-center gap-2">
-                  <Input id="documents" type="file" onChange={handleFileChange} />
-                  <Button onClick={handleFileUpload} className="hover:underline">Upload</Button>
+                  <Input
+                    id="documents"
+                    type="file"
+                    onChange={handleFileChange}
+                  />
+                  <Button
+                    onClick={handleFileUpload}
+                    className="hover:underline"
+                  >
+                    Upload
+                  </Button>
                 </div>
               </div>
             </div>
