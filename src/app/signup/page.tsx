@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 export default function Component() {
   const [fullName, setFullName] = useState("");
@@ -25,6 +26,7 @@ export default function Component() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState("");
   const [avatarImage, setAvatarImage] = useState("/placeholder-user.jpg");
+  const router = useRouter();
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -42,11 +44,34 @@ export default function Component() {
 
     if (!fullName || !email || !password || !confirmPassword || !userType) {
       setErrors("All fields are required");
+      toast.error("All fields are required");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrors("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
     try {
-      const res = await fetch("api/register", {
+      const resUserExists = await fetch("/api/userExists", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const { user } = await resUserExists.json();
+
+      if (user) {
+        setErrors("Email already exists.");
+        toast.error("Email already exists.");
+        return;
+      }
+
+      const res = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,13 +81,11 @@ export default function Component() {
           email,
           userType,
           password,
-          confirmPassword,
+          avatarImage,
         }),
       });
 
       if (res.ok) {
-        const form = e.target;
-
         setAvatarImage("/placeholder-user.jpg");
         setFullName("");
         setEmail("");
@@ -70,11 +93,15 @@ export default function Component() {
         setPassword("");
         setConfirmPassword("");
         setTermsAccepted(false);
+        toast.success("Registration successful");
+        router.push("/signin");
       } else {
-        console.log("User Registration failed");
+        const data = await res.json();
+        toast.error(data.message || "User registration failed");
       }
     } catch (error) {
       console.log("Error during registration", error);
+      toast.error("Error during registration");
     }
   };
 

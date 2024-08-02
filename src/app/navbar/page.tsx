@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { HiMenu, HiX } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
+import { signOut } from "next-auth/react";
 
 const Navbar = () => {
   const router = useRouter();
@@ -21,10 +22,6 @@ const Navbar = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleSignOut = () => {
-    router.push("/onboarding");
   };
 
   return (
@@ -89,7 +86,7 @@ const Navbar = () => {
           </div>
           <div className="hidden md:flex items-center gap-4">
             <Button
-              onClick={handleSignOut}
+              onClick={() => signOut()}
               className="absolute right-10 bg-destructive font-semibold py-2 px-4 rounded-lg text-input border-destructive transition-transform duration-300 ease-in-out hover:scale-105"
             >
               Log Out
@@ -113,7 +110,7 @@ const Navbar = () => {
             <HiX className="text-input text-2xl" />
           </button>
           <Button
-            onClick={handleSignOut}
+            onClick={() => signOut}
             className="absolute right-4 bg-destructive font-semibold py-2 px-4 rounded-lg text-input hover:bg-transparent  border-destructive"
           >
             Log Out

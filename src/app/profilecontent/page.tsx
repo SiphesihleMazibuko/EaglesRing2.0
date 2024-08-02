@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
 import {
   Card,
   CardHeader,
@@ -16,40 +15,20 @@ import { Button } from "@/components/ui/button";
 import Navbar from "../navbar/page";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSession } from "next-auth/react";
 
 export function Profile() {
-  const { user, isLoaded } = useUser();
+  const { data: session } = useSession();
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
+  const [fullName, setFullName] = useState("");
   const [id, setId] = useState("");
   const [company, setCompany] = useState("");
   const [tax, setTax] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
-  useEffect(() => {
-    if (isLoaded && user && user.primaryEmailAddress) {
-      setEmail(user.primaryEmailAddress.emailAddress);
-      setName(user.firstName || "");
-      setSurname(user.lastName || "");
-    }
-  }, [isLoaded, user]);
-
   const handleSaveChanges = () => {
     let valid = true;
 
-    if (!email.includes("@")) {
-      toast.error("Invalid email address");
-      valid = false;
-    }
-    if (!name.trim()) {
-      toast.error("First Name is required");
-      valid = false;
-    }
-    if (!surname.trim()) {
-      toast.error("Last Name is required");
-      valid = false;
-    }
     if (!id.match(/^\d{13}$/)) {
       toast.error("ID Number must be exactly 13 numeric characters");
       valid = false;
@@ -68,7 +47,7 @@ export function Profile() {
     }
 
     if (valid) {
-      console.log({ email, name, surname, id, company, tax, file });
+      console.log({ email, fullName, id, company, tax, file });
       toast.success("Profile updated successfully!");
     }
   };
@@ -92,10 +71,6 @@ export function Profile() {
     }
   };
 
-  if (!isLoaded) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="background-container min-h-screen">
       <Navbar />
@@ -112,44 +87,22 @@ export function Profile() {
                 <Label htmlFor="avatar">Avatar</Label>
                 <Avatar>
                   <AvatarImage
-                    src={
-                      user && user.imageUrl
-                        ? user.imageUrl
-                        : "/placeholder-user.jpg"
-                    }
+                    src={session?.user?.image || "/placeholder-user.jpg"}
                   />
                   <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="name">First Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="bg-neutral-50"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="surname">Last Name</Label>
-                <Input
-                  id="surname"
-                  type="text"
-                  value={surname}
-                  onChange={(e) => setSurname(e.target.value)}
-                  className="bg-neutral-50"
-                />
+                <Label htmlFor="fullName">Full Name</Label>
+                <span id="fullName" className="bg-neutral-50 p-2 rounded">
+                  {session?.user?.name}
+                </span>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-neutral-50"
-                />
+                <span id="email" className="bg-neutral-50 p-2 rounded">
+                  {session?.user?.name}
+                </span>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">

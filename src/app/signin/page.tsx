@@ -6,15 +6,14 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function Page() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
-    {}
-  );
+  const [error, setError] = useState<{ email?: string; password?: string }>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,23 +21,33 @@ export default function Page() {
     if (name === "password") setPassword(value);
   };
 
-  const validate = (): boolean => {
-    const newErrors: { email?: string; password?: string } = {};
-    if (!email) newErrors.email = "Email is required";
-    if (!password) newErrors.password = "Password is required";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (validate()) {
-      toast.success("Login successful!");
-      router.push("/services");
-    } else {
-      Object.values(errors).forEach((error) => {
-        toast.error(error);
+
+    try {
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
       });
+
+      if (!res) {
+        toast.error("An error occurred during login");
+        return;
+      }
+
+      if (res.error) {
+        setError({
+          email: "Email or Password Incorrect",
+          password: "Email or Password Incorrect",
+        });
+        toast.error("Email or Password Incorrect");
+      } else {
+        toast.success("Login successful");
+        router.push("/services");
+      }
+    } catch (error) {
+      toast.error("An error occurred during login");
     }
   };
 
