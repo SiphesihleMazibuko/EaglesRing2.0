@@ -23,7 +23,7 @@ export default function Component() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState("");
   const [avatarImage, setAvatarImage] = useState("/placeholder-user.jpg");
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,28 +37,44 @@ export default function Component() {
     }
   };
 
-  const validate = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!fullName) newErrors.fullName = "Full Name is required";
-    if (!email) newErrors.email = "Email is required";
-    if (!userType) newErrors.userType = "User type is required";
-    if (!password) newErrors.password = "Password is required";
-    if (password !== confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
-    if (!termsAccepted)
-      newErrors.termsAccepted = "You must accept the terms and conditions";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (validate()) {
-      toast.success("Form submitted successfully!");
-    } else {
-      Object.values(errors).forEach((error) => {
-        toast.error(error);
+
+    if (!fullName || !email || !password || !confirmPassword || !userType) {
+      setErrors("All fields are required");
+      return;
+    }
+
+    try {
+      const res = await fetch("api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName,
+          email,
+          userType,
+          password,
+          confirmPassword,
+        }),
       });
+
+      if (res.ok) {
+        const form = e.target;
+
+        setAvatarImage("/placeholder-user.jpg");
+        setFullName("");
+        setEmail("");
+        setUserType("");
+        setPassword("");
+        setConfirmPassword("");
+        setTermsAccepted(false);
+      } else {
+        console.log("User Registration failed");
+      }
+    } catch (error) {
+      console.log("Error during registration", error);
     }
   };
 
