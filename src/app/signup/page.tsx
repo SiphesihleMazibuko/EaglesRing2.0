@@ -15,35 +15,16 @@ import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-interface FormData {
-  fullName: string;
-  email: string;
-  userType: string;
-  password: string;
-  confirmPassword: string;
-  termsAccepted: boolean;
-}
-
 export default function Component() {
-  const [formData, setFormData] = useState<FormData>({
-    fullName: "",
-    email: "",
-    userType: "",
-    password: "",
-    confirmPassword: "",
-    termsAccepted: false,
-  });
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [userType, setUserType] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [avatarImage, setAvatarImage] = useState("/placeholder-user.jpg");
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -58,13 +39,13 @@ export default function Component() {
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
-    if (!formData.fullName) newErrors.fullName = "Full Name is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.userType) newErrors.userType = "User type is required";
-    if (!formData.password) newErrors.password = "Password is required";
-    if (formData.password !== formData.confirmPassword)
+    if (!fullName) newErrors.fullName = "Full Name is required";
+    if (!email) newErrors.email = "Email is required";
+    if (!userType) newErrors.userType = "User type is required";
+    if (!password) newErrors.password = "Password is required";
+    if (password !== confirmPassword)
       newErrors.confirmPassword = "Passwords do not match";
-    if (!formData.termsAccepted)
+    if (!termsAccepted)
       newErrors.termsAccepted = "You must accept the terms and conditions";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -113,8 +94,8 @@ export default function Component() {
               name="fullName"
               placeholder="Full Name"
               className="bg-card text-card-foreground pr-8"
-              value={formData.fullName}
-              onChange={handleInputChange}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
             />
           </div>
           <div className="relative">
@@ -124,15 +105,13 @@ export default function Component() {
               placeholder="Email"
               type="email"
               className="bg-card text-card-foreground pr-8"
-              value={formData.email}
-              onChange={handleInputChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <Select
-            value={formData.userType}
-            onValueChange={(value) =>
-              setFormData({ ...formData, userType: value })
-            }
+            value={userType}
+            onValueChange={(value) => setUserType(value)}
           >
             <SelectTrigger id="option" className="bg-card text-card-foreground">
               <SelectValue placeholder="Select an option" />
@@ -158,8 +137,8 @@ export default function Component() {
               placeholder="Password"
               type={showPassword ? "text" : "password"}
               className="bg-card text-card-foreground pr-8"
-              value={formData.password}
-              onChange={handleInputChange}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <Button
               type="button"
@@ -168,6 +147,7 @@ export default function Component() {
               className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground"
               onClick={() => setShowPassword(!showPassword)}
             >
+              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
               <span className="sr-only">Toggle password visibility</span>
             </Button>
           </div>
@@ -177,15 +157,16 @@ export default function Component() {
               placeholder="Confirm Password"
               type={showPassword ? "text" : "password"}
               className="bg-card text-card-foreground pr-8"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
               id="terms"
               name="termsAccepted"
-              checked={formData.termsAccepted}
+              checked={termsAccepted}
+              onCheckedChange={(checked) => setTermsAccepted(checked === true)}
             />
             <label
               htmlFor="terms"

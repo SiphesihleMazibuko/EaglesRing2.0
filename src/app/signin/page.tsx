@@ -7,17 +7,10 @@ import Link from "next/link";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 
-interface FormData {
-  email: string;
-  password: string;
-}
-
 export default function Page() {
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {}
@@ -25,16 +18,14 @@ export default function Page() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    if (name === "email") setEmail(value);
+    if (name === "password") setPassword(value);
   };
 
   const validate = (): boolean => {
     const newErrors: { email?: string; password?: string } = {};
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
+    if (!email) newErrors.email = "Email is required";
+    if (!password) newErrors.password = "Password is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -50,7 +41,6 @@ export default function Page() {
       });
     }
   };
-  const handleLogin = () => {};
 
   return (
     <div className="flex justify-center py-12 bg-background min-h-screen">
@@ -67,7 +57,7 @@ export default function Page() {
               placeholder="Email"
               type="email"
               className="bg-card text-card-foreground pr-8"
-              value={formData.email}
+              value={email}
               onChange={handleInputChange}
             />
           </div>
@@ -77,7 +67,7 @@ export default function Page() {
               placeholder="Password"
               type={showPassword ? "text" : "password"}
               className="bg-card text-card-foreground pr-8"
-              value={formData.password}
+              value={password}
               onChange={handleInputChange}
             />
             <Button
@@ -96,7 +86,6 @@ export default function Page() {
             </Button>
           </div>
           <Button
-            onClick={handleLogin}
             type="submit"
             className="w-full mt-6 transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]"
           >
