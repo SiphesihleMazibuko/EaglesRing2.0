@@ -106,6 +106,11 @@ export default function Signin() {
               <span className="sr-only">Toggle password visibility</span>
             </Button>
           </div>
+          <div>
+            <Link href="/signup" className=" hover:underline">
+              Forgot Password?
+            </Link>
+          </div>
           <Button
             type="submit"
             className="w-full mt-6 transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]"

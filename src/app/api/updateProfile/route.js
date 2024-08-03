@@ -1,29 +1,61 @@
-import { connectMongoDB } from "@/lib/mongodb";
-import User from "@/models/user";
+import nextConnect from 'next-connect';
+import multer from 'multer';
+import { getSession } from 'next-auth/react';
+import connectMongoDB from '@/lib/mongodb'; // Use ES6 import
+import User from '@/models/user'; // Ensure the path is correct
 
-export async function POST(req, res) {
-  if (req.method === 'POST') {
-    try {
-      const { email, id, company, tax, file } = await req.json();
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
 
-      if (!email || !id || !company || !tax) {
-        return new Response(JSON.stringify({ message: 'All fields are required' }), { status: 400 });
-      }
+const apiRoute = nextConnect({
+  onError(error, req, res) {
+    res.status(501).json({ error: `Something went wrong! ${error.message}` });
+  },
+  onNoMatch(req, res) {
+    res.status(405).json({ error: `Method ${req.method} not allowed` });
+  },
+});
 
-      await connectMongoDB();
+apiRoute.use(upload.single('file'));
 
-      const updatedUser = await User.findOneAndUpdate(
-        { email },
-        { id, company, tax, file },
-        { new: true, upsert: true }
-      );
-
-      return new Response(JSON.stringify({ message: 'Profile updated successfully', user: updatedUser }), { status: 200 });
-    } catch (error) {
-      console.error("Internal server error:", error);
-      return new Response(JSON.stringify({ message: 'Internal server error', error: error.message }), { status: 500 });
-    }
-  } else {
-    return new Response(JSON.stringify({ message: 'Method not allowed' }), { status: 405 });
+apiRoute.post(async (req, res) => {
+  const session = await getSession({ req });
+  if (!session) {
+    return res.status(401).end(); // Unauthorized
   }
-}
+
+  const { email, id, company, tax } = req.body;
+
+  if (!email || !id || !company || !tax) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    await connectMongoDB();
+
+    const fileData = req.file ? req.file.buffer.toString('base64') : null;
+
+    const user = await User.findOneAndUpdate(
+      { email: email },
+      {
+        id: id,
+        company: company,
+        tax: tax,
+        file: fileData, // Store file data or handle separately as needed
+      },
+      { upsert: true, new: true }
+    );
+
+    if (user) {
+      return res.status(200).json({ message: 'Profile updated successfully' });
+    } else {
+      return res.status(500).json({ message: 'Failed to update profile' });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+export default apiRoute;

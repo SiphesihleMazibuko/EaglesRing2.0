@@ -53,12 +53,18 @@ export function Profile() {
 
     if (valid) {
       try {
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("id", id);
+        formData.append("company", company);
+        formData.append("tax", tax);
+        if (file) {
+          formData.append("file", file); // Only append if file is not null
+        }
+
         const response = await fetch("/api/updateProfile", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, id, company, tax, file }),
+          body: formData,
         });
 
         const data = await response.json();

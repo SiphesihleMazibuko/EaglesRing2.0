@@ -1,4 +1,4 @@
-import mongoose, { Schema, models } from "mongoose";
+import mongoose, { Schema, models } from 'mongoose';
 
 const userSchema = new Schema(
   {
@@ -24,10 +24,27 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    id: {
+      type: String,
+      required: true,
+      match: [/^\d{13}$/, "ID Number must be exactly 13 numeric characters."],
+    },
+    company: {
+      type: String,
+      required: true,
+    },
+    tax: {
+      type: String,
+      required: true,
+      match: [/^\d{13}$/, "Tax Number must be exactly 13 numeric characters."],
+    },
+    file: {
+      type: String, // Adjust as needed for file handling (e.g., base64 string, file URL)
+    },
   },
   { timestamps: true }
 );
 
-const User = models.User || mongoose.model("User", userSchema);
+const User = models.User || mongoose.model('User', userSchema);
 
 export default User;
