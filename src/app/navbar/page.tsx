@@ -24,6 +24,10 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const handleSignOut = () => {
+    signOut({ callbackUrl: "/signin" });
+  };
+
   return (
     <div>
       <nav className="bg-neutral-950 p-4 sticky top-0 z-30 flex items-center">
@@ -86,7 +90,7 @@ const Navbar = () => {
           </div>
           <div className="hidden md:flex items-center gap-4">
             <Button
-              onClick={() => signOut()}
+              onClick={handleSignOut}
               className="absolute right-10 bg-destructive font-semibold py-2 px-4 rounded-lg text-input border-destructive transition-transform duration-300 ease-in-out hover:scale-105"
             >
               Log Out
@@ -110,7 +114,7 @@ const Navbar = () => {
             <HiX className="text-input text-2xl" />
           </button>
           <Button
-            onClick={() => signOut}
+            onClick={handleSignOut}
             className="absolute right-4 bg-destructive font-semibold py-2 px-4 rounded-lg text-input hover:bg-transparent  border-destructive"
           >
             Log Out

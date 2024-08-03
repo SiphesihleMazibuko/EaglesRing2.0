@@ -8,21 +8,26 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
-export default function Page() {
+export default function Signin() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<{ email?: string; password?: string }>({});
+  const [error, setError] = useState({ email: "", password: "" });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     if (name === "email") setEmail(value);
     if (name === "password") setPassword(value);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
     try {
       const res = await signIn("credentials", {
