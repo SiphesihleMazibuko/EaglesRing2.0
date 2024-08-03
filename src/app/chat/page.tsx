@@ -5,7 +5,8 @@ function page() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      This is the chat page
+      This is the Project page where entreprenuers will post their pitches and
+      ideas for investors to see
     </div>
   );
 }

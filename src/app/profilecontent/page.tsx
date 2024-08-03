@@ -19,14 +19,19 @@ import { useSession } from "next-auth/react";
 
 export function Profile() {
   const { data: session } = useSession();
-  const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [id, setId] = useState("");
-  const [company, setCompany] = useState("");
-  const [tax, setTax] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [id, setId] = useState<string>("");
+  const [company, setCompany] = useState<string>("");
+  const [tax, setTax] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
 
-  const handleSaveChanges = () => {
+  useEffect(() => {
+    if (session?.user?.email) {
+      setEmail(session.user.email);
+    }
+  }, [session]);
+
+  const handleSaveChanges = async () => {
     let valid = true;
 
     if (!id.match(/^\d{13}$/)) {
@@ -47,8 +52,25 @@ export function Profile() {
     }
 
     if (valid) {
-      console.log({ email, fullName, id, company, tax, file });
-      toast.success("Profile updated successfully!");
+      try {
+        const response = await fetch("/api/updateProfile", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, id, company, tax, file }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          toast.success("Profile updated successfully!");
+        } else {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        toast.error("Failed to update profile");
+      }
     }
   };
 
@@ -100,9 +122,12 @@ export function Profile() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <span id="email" className="bg-neutral-50 p-2 rounded">
-                  {session?.user?.name}
-                </span>
+                <Input
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-neutral-50"
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">

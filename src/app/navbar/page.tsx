@@ -59,7 +59,7 @@ const Navbar = () => {
                   href="/chat"
                   className="menu-item cursor-pointer text-white hover:text-gray-300"
                 >
-                  Chat
+                  Projects
                 </Link>
               </li>
               <li>

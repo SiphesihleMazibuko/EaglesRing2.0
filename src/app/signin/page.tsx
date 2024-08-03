@@ -30,11 +30,17 @@ export default function Signin() {
     }
 
     try {
+      console.log("Attempting to sign in with credentials:", {
+        email,
+        password,
+      });
       const res = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
+
+      console.log("Sign in response:", res);
 
       if (!res) {
         toast.error("An error occurred during login");
@@ -52,6 +58,7 @@ export default function Signin() {
         router.push("/services");
       }
     } catch (error) {
+      console.error("An error occurred during login:", error);
       toast.error("An error occurred during login");
     }
   };

@@ -1,51 +1,69 @@
-import { connectMongoDB } from "@/lib/mongodb";
-import User from "@/models/user";
-import NextAuth from "next-auth/next";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from 'bcryptjs'
-import { use } from "react";
+import bcrypt from "bcryptjs";
+import connectMongoDB from "@/lib/mongodb";
+import User from "@/models/user";
 
 const authOptions = {
-    providers: [
-        CredentialsProvider({
-            name: "credentials",
-            credentials: {},
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials) {
+          console.error("Credentials are missing");
+          throw new Error("Credentials are missing");
+        }
 
-            async authorize(credentials){
-                const {email, password} =  credentials;
+        const { email, password } = credentials;
 
-                try {
-                    await connectMongoDB();
-                    const user = await User.findOne({email})
+        await connectMongoDB();
 
-                    if (!user){
-                        return null
-                    }
+        const user = await User.findOne({ email });
+        if (!user) {
+          console.error("No user found with the email");
+          throw new Error("No user found with the email");
+        }
 
-                    const passwordsMatch = await bcrypt.compare(password, user.password);
+        const passwordsMatch = await bcrypt.compare(password, user.password);
+        if (!passwordsMatch) {
+          console.error("Password is incorrect");
+          throw new Error("Password is incorrect");
+        }
 
-                    if (!passwordsMatch){
-                        return null
-                    }
-
-                    return use
-
-                } catch (error) {
-                    console.log("Error: ", error)
-                }
-                
-            },
-        }),
-    ],
-    session: {
-        strategy: "jwt",
+        console.log("User authenticated successfully:", user.email);
+        return { email: user.email, name: user.fullName, image: user.avatarImage };
+      },
+    }),
+  ],
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 24 hours
+  },
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
     },
-    secret:process.env.NEXTAUTH_SECRET,
-    pages : {
-        signIn: '/signin'
-    },
+  },
+  pages: {
+    signIn: "/signin",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
-const handler = NextAuth(authOptions);
-
-export {handler as GET, handler as POST};
+export const GET = (req, res) => NextAuth(req, res, authOptions);
+export const POST = (req, res) => NextAuth(req, res, authOptions);
