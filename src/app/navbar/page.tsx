@@ -56,7 +56,7 @@ const Navbar = () => {
               </li>
               <li>
                 <Link
-                  href="/chat"
+                  href="/postproject"
                   className="menu-item cursor-pointer text-white hover:text-gray-300"
                 >
                   Projects
@@ -131,10 +131,10 @@ const Navbar = () => {
           </li>
           <li>
             <Link
-              href="/chat"
+              href="/postproject"
               className="menu-item cursor-pointer text-white hover:text-gray-300"
             >
-              Chat
+              Projects
             </Link>
           </li>
           <li>

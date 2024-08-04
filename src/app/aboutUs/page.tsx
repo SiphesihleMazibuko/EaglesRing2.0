@@ -2,11 +2,15 @@
 import BackButton from "@/components/backbutton/Button";
 import React from "react";
 import Navbar from "../navbar/page";
+import { useSession } from "next-auth/react";
+import InvestorNavbar from "../investornavbar/page";
 
 const AboutUs = () => {
+  const { data: session } = useSession();
+
   return (
     <div className="background-container min-h-screen">
-      <Navbar />
+      {session?.user?.userType === "Investor" ? <InvestorNavbar /> : <Navbar />}
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-full max-w-screen-xl px-4 md:px-8 lg:px-0">
           <BackButton />

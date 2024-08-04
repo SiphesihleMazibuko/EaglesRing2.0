@@ -1,6 +1,6 @@
 "use client";
 import { ToastContainer, toast } from "react-toastify";
-import { SVGProps, useState } from "react";
+import { JSX, SVGProps, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -30,17 +30,11 @@ export default function Signin() {
     }
 
     try {
-      console.log("Attempting to sign in with credentials:", {
-        email,
-        password,
-      });
       const res = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
-
-      console.log("Sign in response:", res);
 
       if (!res) {
         toast.error("An error occurred during login");
@@ -55,10 +49,9 @@ export default function Signin() {
         toast.error("Email or Password Incorrect");
       } else {
         toast.success("Login successful");
-        router.push("/services");
+        router.push("/api/auth/callback");
       }
     } catch (error) {
-      console.error("An error occurred during login:", error);
       toast.error("An error occurred during login");
     }
   };

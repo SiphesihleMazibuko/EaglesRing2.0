@@ -39,7 +39,7 @@ const userSchema = new Schema(
       match: [/^\d{13}$/, "Tax Number must be exactly 13 numeric characters."],
     },
     file: {
-      type: String, // Adjust as needed for file handling (e.g., base64 string, file URL)
+      type: String,
     },
   },
   { timestamps: true }

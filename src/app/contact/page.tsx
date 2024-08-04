@@ -1,13 +1,17 @@
 "use client";
 import React from "react";
+import { useSession } from "next-auth/react";
 import BackButton from "@/components/backbutton/Button";
 import Navbar from "../navbar/page";
 import { Button } from "@/components/ui/button";
+import InvestorNavbar from "../investornavbar/page";
 
 const ContactPage = () => {
+  const { data: session } = useSession();
+
   return (
     <div className="background-container min-h-screen">
-      <Navbar />
+      {session?.user?.userType === "Investor" ? <InvestorNavbar /> : <Navbar />}
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-4xl p-8 rounded-lg shadow-lg text-white">
           <h1 className="text-3xl font-bold mb-6 text-center text-black">

@@ -16,6 +16,7 @@ import Navbar from "../navbar/page";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSession } from "next-auth/react";
+import InvestorNavbar from "../investornavbar/page";
 
 export function Profile() {
   const { data: session } = useSession();
@@ -101,7 +102,7 @@ export function Profile() {
 
   return (
     <div className="background-container min-h-screen">
-      <Navbar />
+      {session?.user?.userType === "Investor" ? <InvestorNavbar /> : <Navbar />}
       <ToastContainer />
       <div className="flex flex-col items-center justify-center flex-grow py-10">
         <Card className="w-full max-w-3xl mx-auto">
@@ -122,18 +123,30 @@ export function Profile() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="fullName">Full Name</Label>
-                <span id="fullName" className="bg-neutral-50 p-2 rounded">
+                <span
+                  id="fullName"
+                  className="bg-neutral-50 p-2 rounded font-bold"
+                >
                   {session?.user?.name}
                 </span>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input
+                <span
                   id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-neutral-50"
-                />
+                  className="bg-neutral-50 p-2 rounded font-bold"
+                >
+                  {session?.user?.email}
+                </span>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="userType">Type</Label>
+                <span
+                  id="userType"
+                  className="bg-neutral-50 p-2 rounded font-bold"
+                >
+                  {session?.user?.userType}
+                </span>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
