@@ -60,7 +60,7 @@ export function Profile() {
         formData.append("company", company);
         formData.append("tax", tax);
         if (file) {
-          formData.append("file", file); // Only append if file is not null
+          formData.append("file", file);
         }
 
         const response = await fetch("/api/updateProfile", {

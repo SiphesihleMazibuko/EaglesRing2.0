@@ -1,8 +1,8 @@
 import nextConnect from 'next-connect';
 import multer from 'multer';
 import { getSession } from 'next-auth/react';
-import connectMongoDB from '@/lib/mongodb'; // Use ES6 import
-import User from '@/models/user'; // Ensure the path is correct
+import connectMongoDB from '@/lib/mongodb'; 
+import User from '@/models/user'; 
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -22,7 +22,7 @@ apiRoute.use(upload.single('file'));
 apiRoute.post(async (req, res) => {
   const session = await getSession({ req });
   if (!session) {
-    return res.status(401).end(); // Unauthorized
+    return res.status(401).end(); 
   }
 
   const { email, id, company, tax } = req.body;
@@ -42,7 +42,7 @@ apiRoute.post(async (req, res) => {
         id: id,
         company: company,
         tax: tax,
-        file: fileData, // Store file data or handle separately as needed
+        file: fileData, 
       },
       { upsert: true, new: true }
     );

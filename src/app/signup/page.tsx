@@ -24,6 +24,9 @@ export default function Component() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [tax, setTax] = useState("");
+  const [company, setCompany] = useState("");
+  const [idnum, setIdnum] = useState("");
   const [errors, setErrors] = useState("");
   const [avatarImage, setAvatarImage] = useState("/placeholder-user.jpg");
   const router = useRouter();
@@ -42,7 +45,16 @@ export default function Component() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!fullName || !email || !password || !confirmPassword || !userType) {
+    if (
+      !fullName ||
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !userType ||
+      !tax ||
+      !company ||
+      !idnum
+    ) {
       setErrors("All fields are required");
       toast.error("All fields are required");
       return;
@@ -51,6 +63,11 @@ export default function Component() {
     if (password !== confirmPassword) {
       setErrors("Passwords do not match");
       toast.error("Passwords do not match");
+      return;
+    }
+    if (idnum.length < 13 || idnum.length > 13) {
+      setErrors("ID number must be 13 digits");
+      toast.error("ID number must be 13 digits");
       return;
     }
 
@@ -82,6 +99,9 @@ export default function Component() {
           userType,
           password,
           avatarImage,
+          tax,
+          company,
+          idnum,
         }),
       });
 
@@ -92,6 +112,9 @@ export default function Component() {
         setUserType("");
         setPassword("");
         setConfirmPassword("");
+        setTax("");
+        setCompany("");
+        setIdnum("");
         setTermsAccepted(false);
         toast.success("Registration successful");
         router.push("/signin");
@@ -150,6 +173,39 @@ export default function Component() {
               className="bg-card text-card-foreground pr-8"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="relative">
+            <MailIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              name="tax"
+              placeholder="Tax number"
+              type="text"
+              className="bg-card text-card-foreground pr-8"
+              value={tax}
+              onChange={(e) => setTax(e.target.value)}
+            />
+          </div>
+          <div className="relative">
+            <MailIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              name="company"
+              placeholder="Company Name"
+              type="text"
+              className="bg-card text-card-foreground pr-8"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+            />
+          </div>
+          <div className="relative">
+            <UserIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              name="id"
+              placeholder="id"
+              type="text"
+              className="bg-card text-card-foreground pr-8"
+              value={idnum}
+              onChange={(e) => setIdnum(e.target.value)}
             />
           </div>
           <Select

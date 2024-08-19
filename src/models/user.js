@@ -24,7 +24,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    id: {
+    idnum: {
       type: String,
       required: true,
       match: [/^\d{13}$/, "ID Number must be exactly 13 numeric characters."],
