@@ -1,14 +1,28 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import InvestorNavbar from "../investornavbar/page";
 import Footer from "../footer/page";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Business1 from "@/assets/Business1.png";
-import Business2 from "@/assets/Busines2.jpeg";
+import Image1 from "@/assets/wallpaperflare.com_wallpaper.jpg";
 
-const page = () => {
+const Page = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+
+  const toggleReadMore = () => {
+    setIsExpanded((prev) => !prev);
+  };
+
+  const handleConnect = () => {
+    toast.info("Connection request sent! Waiting for approval.");
+    setIsConnected(true);
+  };
+
   return (
     <section className="background-container flex flex-col items-center ">
       <div className="w-full bg-neutral-50">
@@ -24,7 +38,55 @@ const page = () => {
             startups.
           </p>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-0">
+              <Image
+                src={Image1}
+                width={400}
+                height={225}
+                alt="Project Image"
+                className="aspect-video object-cover"
+              />
+            </CardContent>
+            <CardFooter className="p-4">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <h4 className="text-sm font-medium">TechInvaders</h4>
+                    </div>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className={`font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out ${
+                      isConnected
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
+                    }`}
+                    onClick={handleConnect}
+                    disabled={isConnected}
+                  >
+                    {isConnected ? "Pending Approval" : "Connect"}
+                  </Button>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Building web applications for companies
+                  </p>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="p-0 mt-1 text-sm font-semibold text-blue-500 hover:underline"
+                    onClick={toggleReadMore}
+                  >
+                    {isExpanded ? "Read Less" : "Read More"}
+                  </Button>
+                </div>
+              </div>
+            </CardFooter>
+          </Card>
           <Card className="border-0 shadow-sm">
             <CardContent className="p-0">
               <Image
@@ -39,156 +101,41 @@ const page = () => {
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage
-                        src="/placeholder-user.jpg"
-                        alt="Company Logo"
-                      />
-                      <AvatarFallback>AC</AvatarFallback>
-                    </Avatar>
                     <div>
-                      <h4 className="text-sm font-medium">Acme Inc</h4>
-                      <p className="text-xs text-muted-foreground">
-                        Project Idea
-                      </p>
+                      <h4 className="text-sm font-medium">Company 1</h4>
                     </div>
                   </div>
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
+                    className={`font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out ${
+                      isConnected
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
+                    }`}
+                    onClick={handleConnect}
+                    disabled={isConnected}
                   >
-                    Connect
+                    {isConnected ? "Pending Approval" : "Connect"}
                   </Button>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    Revolutionize the way you manage your finances with our
-                    innovative budgeting app.
+                  <p className="text-sm text-muted-foreground">
+                    {isExpanded
+                      ? "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus est at ipsum reiciendis consectetur ad, cumque, ea id magnam placeat velit exercitationem in nisi sunt similique aut delectus quo maxime!"
+                      : "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus est at ipsum reiciendis consectetur ad, cumque, ea id magnam placeat velit exercitationem in nisi sunt similique aut delectus quo maxime!".slice(
+                          0,
+                          100
+                        ) + "..."}
                   </p>
-                </div>
-              </div>
-            </CardFooter>
-          </Card>
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-0">
-              <div className="aspect-video object-cover" />
-            </CardContent>
-            <CardFooter className="p-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage
-                        src="/placeholder-user.jpg"
-                        alt="Company Logo"
-                      />
-                      <AvatarFallback>BC</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h4 className="text-sm font-medium">Bravo Corp</h4>
-                      <p className="text-xs text-muted-foreground">
-                        Project Idea
-                      </p>
-                    </div>
-                  </div>
                   <Button
-                    variant="secondary"
+                    variant="link"
                     size="sm"
-                    className="font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
+                    className="p-0 mt-1 text-sm font-semibold text-blue-500 hover:underline"
+                    onClick={toggleReadMore}
                   >
-                    Connect
+                    {isExpanded ? "Read Less" : "Read More"}
                   </Button>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    Streamline your workflow with our all-in-one project
-                    management platform.
-                  </p>
-                </div>
-              </div>
-            </CardFooter>
-          </Card>
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-0">
-              <Image
-                src={Business2}
-                width={400}
-                height={225}
-                alt="Project Image"
-                className="aspect-video object-cover"
-              />
-            </CardContent>
-            <CardFooter className="p-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage
-                        src="/placeholder-user.jpg"
-                        alt="Company Logo"
-                      />
-                      <AvatarFallback>CC</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h4 className="text-sm font-medium">Charlie Co</h4>
-                      <p className="text-xs text-muted-foreground">
-                        Project Idea
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
-                  >
-                    Connect
-                  </Button>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    Unlock the power of AI-driven insights to transform your
-                    business.
-                  </p>
-                </div>
-              </div>
-            </CardFooter>
-          </Card>
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-0">
-              <div className="aspect-video object-cover" />
-            </CardContent>
-            <CardFooter className="p-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage
-                        src="/placeholder-user.jpg"
-                        alt="Company Logo"
-                      />
-                      <AvatarFallback>DC</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h4 className="text-sm font-medium">Delta Inc</h4>
-                      <p className="text-xs text-muted-foreground">
-                        Project Idea
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
-                  >
-                    Connect
-                  </Button>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    Elevate your e-commerce experience with our cutting-edge
-                    online store platform.
-                  </p>
                 </div>
               </div>
             </CardFooter>
@@ -196,8 +143,9 @@ const page = () => {
         </div>
       </div>
       <Footer />
+      <ToastContainer />
     </section>
   );
 };
 
-export default page;
+export default Page;

@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ToastContainer, toast } from "react-toastify";
-import { getSession, signIn } from "next-auth/react";
 import "react-toastify/dist/ReactToastify.css";
 
 function PostProject() {
@@ -15,7 +14,6 @@ function PostProject() {
     image: null,
     video: null,
   });
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
@@ -25,72 +23,25 @@ function PostProject() {
     }));
   };
 
-  const validateForm = () => {
-    if (!formData.companyName || !formData.projectIdea) {
-      toast.error("Please fill out all required fields.");
-      return false;
-    }
-    return true;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
-
-    const session = await getSession();
-    console.log("Session on client:", session);
-
-    if (!session) {
-      toast.error("You must be logged in to post a project.");
-      console.error("Session is not available");
-      signIn(); // Redirect to sign-in page
+    if (!formData.companyName || !formData.projectIdea) {
+      toast.error("Please fill out all required fields.");
       return;
     }
 
-    setLoading(true);
+    // Log the formData to ensure it's being constructed correctly
+    console.log("Form Submitted:", formData);
 
-    const formDataToSend = new FormData();
-    formDataToSend.append("companyName", formData.companyName);
-    formDataToSend.append("projectIdea", formData.projectIdea);
-
-    if (formData.image) {
-      formDataToSend.append("image", formData.image);
-    }
-
-    if (formData.video) {
-      formDataToSend.append("video", formData.video);
-    }
-
-    try {
-      const response = await fetch("/api/saveProject", {
-        method: "POST",
-        body: formDataToSend,
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save project");
-      }
-
-      toast.success("Project posted successfully!");
-      setFormData({
-        companyName: "",
-        projectIdea: "",
-        image: null,
-        video: null,
-      });
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error("Failed to post the project. Please try again.");
-        console.error("Error posting project:", error.message);
-      }
-    } finally {
-      setLoading(false);
-    }
+    // Display success message and clear the form
+    toast.success("Project posted successfully!");
+    setFormData({
+      companyName: "",
+      projectIdea: "",
+      image: null,
+      video: null,
+    });
   };
 
   return (
@@ -143,7 +94,7 @@ function PostProject() {
                   onChange={handleChange}
                 />
               </div>
-              <div className="grid gap-2">
+              {/* <div className="grid gap-2">
                 <Label
                   htmlFor="video"
                   className="hover:underline cursor-pointer"
@@ -157,14 +108,13 @@ function PostProject() {
                   accept="video/*"
                   onChange={handleChange}
                 />
-              </div>
+              </div> */}
             </div>
             <Button
               type="submit"
               className="ml-auto font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
-              disabled={loading}
             >
-              {loading ? "Posting..." : "Post"}
+              Post
             </Button>
           </form>
         </div>
