@@ -1,4 +1,5 @@
 import mongoose, { Schema, models } from 'mongoose';
+import { type } from 'os';
 
 const pitchSchema = new Schema(
   {
@@ -19,6 +20,9 @@ const pitchSchema = new Schema(
       type: String, 
     },
     pitchVideo: {
+      type: String,
+    },
+    businessPhase: {
       type: String,
     },
   },

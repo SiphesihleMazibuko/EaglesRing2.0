@@ -6,6 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function PostProject() {
   const [formData, setFormData] = useState({
@@ -13,6 +21,7 @@ function PostProject() {
     projectIdea: "",
     image: null,
     video: null,
+    businessPhase: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,25 +32,54 @@ function PostProject() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSelectChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      businessPhase: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.companyName || !formData.projectIdea) {
+    if (
+      !formData.companyName ||
+      !formData.projectIdea ||
+      !formData.businessPhase
+    ) {
       toast.error("Please fill out all required fields.");
       return;
     }
 
-    // Log the formData to ensure it's being constructed correctly
-    console.log("Form Submitted:", formData);
+    const form = new FormData();
+    form.append("companyName", formData.companyName);
+    form.append("projectIdea", formData.projectIdea);
+    form.append("businessPhase", formData.businessPhase);
+    if (formData.image) form.append("image", formData.image);
+    if (formData.video) form.append("video", formData.video);
 
-    // Display success message and clear the form
-    toast.success("Project posted successfully!");
-    setFormData({
-      companyName: "",
-      projectIdea: "",
-      image: null,
-      video: null,
-    });
+    try {
+      const response = await fetch("/api/saveProject", {
+        method: "POST",
+        body: form,
+      });
+
+      if (response.ok) {
+        toast.success("Project posted successfully!");
+        setFormData({
+          companyName: "",
+          projectIdea: "",
+          image: null,
+          video: null,
+          businessPhase: "",
+        });
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to post project.");
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -94,7 +132,7 @@ function PostProject() {
                   onChange={handleChange}
                 />
               </div>
-              {/* <div className="grid gap-2">
+              <div className="grid gap-2">
                 <Label
                   htmlFor="video"
                   className="hover:underline cursor-pointer"
@@ -108,15 +146,32 @@ function PostProject() {
                   accept="video/*"
                   onChange={handleChange}
                 />
-              </div> */}
+              </div>
             </div>
-            <Button
-              type="submit"
-              className="ml-auto font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
-            >
-              Post
-            </Button>
           </form>
+          <div>
+            <Select onValueChange={handleSelectChange}>
+              <SelectTrigger className="w-[280px]">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent side="bottom" sideOffset={5}>
+                <SelectGroup>
+                  <SelectItem value="initial">Initial Phase</SelectItem>
+                  <SelectItem value="startup">Startup Phase</SelectItem>
+                  <SelectItem value="growth">Growth Phase</SelectItem>
+                  <SelectItem value="maturity">Maturity Phase</SelectItem>
+                  <SelectItem value="expansion">Expansion Phase</SelectItem>
+                  <SelectItem value="decline">Decline/Renewal Phase</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button
+            type="submit"
+            className="ml-auto font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
+          >
+            Post
+          </Button>
         </div>
       </div>
     </div>
