@@ -1,55 +1,38 @@
-import formidable from 'formidable';
-import fs from 'fs';
-import path from 'path';
-import Pitch from '@/models/Pitch';
-import connectMongoDB from "@/lib/mongodb";
+import authOptions from "@/lib/authOptions";
+import dbConnect from "@/lib/mongodb";
+import Pitch from "@/models/pitch";
+import User from "@/models/user";
+import { getServerSession } from "next-auth";
 
-export const config = {
-  api: {
-    bodyParser: false, // Disabling Next.js body parser, formidable will handle it
-  },
-};
+export async function POST(req) {
+  await dbConnect();
+  const session = await getServerSession({req, ...authOptions});
 
-export default async function handler(req, res) {
-  await connectMongoDB();
+  try {
+    const { email, companyName, projectIdea, businessPhase, image, video } = await req.json();
 
-  if (req.method === 'POST') {
-    const form = new formidable.IncomingForm({
-      uploadDir: './public/uploads', // Directory where files will be uploaded
-      keepExtensions: true, // Keep file extensions
+    
+    const user = await User.findOne({ email: session.user.email });
+
+
+    if (!user) {
+      return new Response(JSON.stringify({ message: "User not found." }), { status: 404 });
+    }
+
+    const newPitch = new Pitch({
+      entrepreneurId: user._id,
+      companyName,
+      projectIdea,
+      projectImage: image,
+      pitchVideo: video,
+      businessPhase,
     });
 
-    form.parse(req, async (err, fields, files) => {
-      if (err) {
-        return res.status(500).json({ success: false, message: 'File parsing error' });
-      }
+    await newPitch.save();
 
-      try {
-        const { companyName, projectIdea } = fields;
-
-        if (!companyName || !projectIdea) {
-          return res.status(400).json({ success: false, message: 'Required fields are missing' });
-        }
-
-        const imagePath = files.image ? `/uploads/${path.basename(files.image.filepath)}` : null;
-        const videoPath = files.video ? `/uploads/${path.basename(files.video.filepath)}` : null;
-
-        const pitch = new Pitch({
-          entrepreneurId: req.user._id, // Assuming you have user authentication set up
-          companyName,
-          projectIdea,
-          projectImage: imagePath,
-          pitchVideo: videoPath,
-        });
-
-        await pitch.save();
-
-        res.status(201).json({ success: true, data: pitch });
-      } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
-      }
-    });
-  } else {
-    res.status(405).json({ success: false, message: 'Method not allowed' });
+    return new Response(JSON.stringify({ message: "Project posted successfully!" }), { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return new Response(JSON.stringify({ message: "Failed to post project.", error }), { status: 500 });
   }
 }

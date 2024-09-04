@@ -1,5 +1,5 @@
 import mongoose, { Schema, models } from 'mongoose';
-import { type } from 'os';
+
 
 const pitchSchema = new Schema(
   {

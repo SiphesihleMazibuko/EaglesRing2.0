@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
+import { UserProvider } from "@/lib/UserContext";
 import { AuthProvider } from "../components/Providers";
 import Navbar from "./navbar/page";
 
@@ -21,7 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>{children}</AuthProvider>
+        <UserProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </UserProvider>
       </body>
     </html>
   );

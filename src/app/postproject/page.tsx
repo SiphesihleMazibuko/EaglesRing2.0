@@ -14,8 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useUser } from "@/lib/UserContext";
 
 function PostProject() {
+  const { user } = useUser();
+  const email = user?.email;
+
   const [formData, setFormData] = useState({
     companyName: "",
     projectIdea: "",
@@ -51,17 +55,22 @@ function PostProject() {
       return;
     }
 
-    const form = new FormData();
-    form.append("companyName", formData.companyName);
-    form.append("projectIdea", formData.projectIdea);
-    form.append("businessPhase", formData.businessPhase);
-    if (formData.image) form.append("image", formData.image);
-    if (formData.video) form.append("video", formData.video);
-
     try {
+      const payload = {
+        email,
+        companyName: formData.companyName,
+        projectIdea: formData.projectIdea,
+        businessPhase: formData.businessPhase,
+        image: formData.image ? URL.createObjectURL(formData.image) : null,
+        video: formData.video ? URL.createObjectURL(formData.video) : null,
+      };
+
       const response = await fetch("/api/saveProject", {
         method: "POST",
-        body: form,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -148,30 +157,36 @@ function PostProject() {
                 />
               </div>
             </div>
+            <div>
+              <Select onValueChange={handleSelectChange}>
+                <SelectTrigger className="w-[280px]">
+                  <SelectValue placeholder="Select an option" />
+                </SelectTrigger>
+                <SelectContent side="bottom" sideOffset={5}>
+                  <SelectGroup>
+                    <SelectItem value="Initial Phase">Initial Phase</SelectItem>
+                    <SelectItem value="Startup Phase">Startup Phase</SelectItem>
+                    <SelectItem value="Growth Phase">Growth Phase</SelectItem>
+                    <SelectItem value="Maturity Phase">
+                      Maturity Phase
+                    </SelectItem>
+                    <SelectItem value="Expansion Phase">
+                      Expansion Phase
+                    </SelectItem>
+                    <SelectItem value="Decline Phase">
+                      Decline/Renewal Phase
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              type="submit"
+              className="ml-auto font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
+            >
+              Post
+            </Button>
           </form>
-          <div>
-            <Select onValueChange={handleSelectChange}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select an option" />
-              </SelectTrigger>
-              <SelectContent side="bottom" sideOffset={5}>
-                <SelectGroup>
-                  <SelectItem value="initial">Initial Phase</SelectItem>
-                  <SelectItem value="startup">Startup Phase</SelectItem>
-                  <SelectItem value="growth">Growth Phase</SelectItem>
-                  <SelectItem value="maturity">Maturity Phase</SelectItem>
-                  <SelectItem value="expansion">Expansion Phase</SelectItem>
-                  <SelectItem value="decline">Decline/Renewal Phase</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <Button
-            type="submit"
-            className="ml-auto font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
-          >
-            Post
-          </Button>
         </div>
       </div>
     </div>
