@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../navbar/page";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,16 @@ import {
 } from "@/components/ui/select";
 import { useUser } from "@/lib/UserContext";
 
+interface Project {
+  _id: string;
+  companyName: string;
+  projectIdea: string;
+  businessPhase: string;
+  pitchVideo: string | null;
+  projectImage: string | null;
+  createdAt: string;
+}
+
 function PostProject() {
   const { user } = useUser();
   const email = user?.email;
@@ -27,6 +37,25 @@ function PostProject() {
     video: null,
     businessPhase: "",
   });
+
+  const [userProjects, setUserProjects] = useState<Project[]>([]);
+
+  // Fetch user's previously posted projects on page load
+  useEffect(() => {
+    const fetchUserProjects = async () => {
+      if (!email) return;
+
+      try {
+        const response = await fetch(`/api/getUserProject?email=${email}`);
+        const data = await response.json();
+        setUserProjects(data);
+      } catch (error) {
+        console.error("Error fetching user projects:", error);
+      }
+    };
+
+    fetchUserProjects();
+  }, [email]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
@@ -75,6 +104,7 @@ function PostProject() {
 
       if (response.ok) {
         toast.success("Project posted successfully!");
+
         setFormData({
           companyName: "",
           projectIdea: "",
@@ -82,6 +112,9 @@ function PostProject() {
           video: null,
           businessPhase: "",
         });
+
+        const updatedProjects = await response.json();
+        setUserProjects((prevProjects) => [...prevProjects, updatedProjects]);
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Failed to post project.");
@@ -106,6 +139,7 @@ function PostProject() {
               potential partners.
             </p>
           </div>
+
           <form className="grid gap-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
@@ -125,6 +159,7 @@ function PostProject() {
                 required
               />
             </div>
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label
@@ -157,6 +192,7 @@ function PostProject() {
                 />
               </div>
             </div>
+
             <div>
               <Select onValueChange={handleSelectChange}>
                 <SelectTrigger className="w-[280px]">
@@ -180,6 +216,7 @@ function PostProject() {
                 </SelectContent>
               </Select>
             </div>
+
             <Button
               type="submit"
               className="ml-auto font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
@@ -187,6 +224,43 @@ function PostProject() {
               Post
             </Button>
           </form>
+
+          {/* Display user's posted projects */}
+          <div className="mt-10">
+            <h3 className="text-2xl font-semibold">Your Posted Projects</h3>
+            {userProjects.length === 0 ? (
+              <p>You haven&apos;t posted any projects yet.</p>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+                {userProjects.map((project) => (
+                  <div key={project._id} className="border p-4 rounded-lg">
+                    <h4 className="text-lg font-bold">{project.companyName}</h4>
+                    <p className="text-sm">{project.projectIdea}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(project.createdAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                    {project.pitchVideo && (
+                      <video controls className="mt-2" width="100%">
+                        <source src={project.pitchVideo} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
+                    {project.projectImage && (
+                      <img
+                        src={project.projectImage}
+                        alt={`${project.companyName} Image`}
+                        className="mt-2 w-full h-40 object-cover"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

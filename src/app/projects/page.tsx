@@ -13,6 +13,7 @@ interface Pitch {
   projectIdea: string;
   pitchVideo: string;
   businessPhase: string;
+  createdAt: string;
 }
 
 interface PitchState {
@@ -87,6 +88,14 @@ const Page = () => {
                 isConnected: false,
               };
 
+              const createdAtDate = new Date(
+                pitch.createdAt
+              ).toLocaleDateString("en-UK", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+
               return (
                 <Card key={pitch._id} className="border-0 shadow-sm">
                   <CardContent className="p-0">
@@ -111,12 +120,15 @@ const Page = () => {
                             <p className="text-xs text-muted-foreground">
                               {pitch.businessPhase}
                             </p>
+                            <p className="text-xs text-muted-foreground">
+                              Created on: {createdAtDate}{" "}
+                            </p>
                           </div>
                         </div>
                         <Button
                           variant="secondary"
                           size="sm"
-                          className={`font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out ${
+                          className={`font-bold text-sm py-2 px-5 ml-10 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out ${
                             pitchState.isConnected
                               ? "bg-gray-400 cursor-not-allowed"
                               : "hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
