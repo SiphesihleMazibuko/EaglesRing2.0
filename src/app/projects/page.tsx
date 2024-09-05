@@ -5,6 +5,13 @@ import Footer from "../footer/page";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ToastContainer, toast } from "react-toastify";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import "react-toastify/dist/ReactToastify.css";
 
 interface Pitch {
@@ -26,6 +33,8 @@ const Page = () => {
   const [pitchStates, setPitchStates] = useState<{ [key: string]: PitchState }>(
     {}
   );
+  const [selectedPhase, setSelectedPhase] = useState<string>(""); // State for filtering by phase
+  const [sortOrder, setSortOrder] = useState<string>("newest"); // State for sorting order
 
   useEffect(() => {
     const fetchPitches = async () => {
@@ -63,6 +72,17 @@ const Page = () => {
     }));
   };
 
+  const filteredPitches = pitches
+    .filter((pitch) => {
+      if (!selectedPhase) return true;
+      return pitch.businessPhase === selectedPhase;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+    });
+
   return (
     <section className="background-container flex flex-col items-center ">
       <div className="w-full bg-neutral-50">
@@ -78,11 +98,87 @@ const Page = () => {
             startups.
           </p>
         </div>
-        {pitches.length === 0 ? (
+
+        <div className="flex justify-between gap-4">
+          {/* Filter by Business Phase */}
+          <div className="w-1/2">
+            <Select onValueChange={(value) => setSelectedPhase(value)}>
+              <SelectTrigger
+                aria-label="Filter by Business Phase"
+                className="bg-card text-card-foreground"
+              >
+                <SelectValue placeholder="Filter by Business Phase" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  value="Initial Phase"
+                  className="bg-card text-card-foreground"
+                >
+                  Initial Phase
+                </SelectItem>
+                <SelectItem
+                  value="Startup Phase"
+                  className="bg-card text-card-foreground"
+                >
+                  Startup Phase
+                </SelectItem>
+                <SelectItem
+                  value="Growth Phase"
+                  className="bg-card text-card-foreground"
+                >
+                  Growth Phase
+                </SelectItem>
+                <SelectItem
+                  value="Maturity Phase"
+                  className="bg-card text-card-foreground"
+                >
+                  Maturity Phase
+                </SelectItem>
+                <SelectItem
+                  value="Expansion Phase"
+                  className="bg-card text-card-foreground"
+                >
+                  Expansion Phase
+                </SelectItem>
+                <SelectItem
+                  value="Decline Phase"
+                  className="bg-card text-card-foreground"
+                >
+                  Decline/Renewal Phase
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Sort by Date */}
+          <div className="w-1/2">
+            <Select onValueChange={(value) => setSortOrder(value)}>
+              <SelectTrigger aria-label="Sort by Date">
+                <SelectValue placeholder="Sort by Date" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  value="newest"
+                  className="bg-card text-card-foreground"
+                >
+                  Newest
+                </SelectItem>
+                <SelectItem
+                  value="oldest"
+                  className="bg-card text-card-foreground"
+                >
+                  Oldest
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {filteredPitches.length === 0 ? (
           <p>No pitches found.</p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-            {pitches.map((pitch) => {
+            {filteredPitches.map((pitch) => {
               const pitchState = pitchStates[pitch._id] || {
                 isExpanded: false,
                 isConnected: false,

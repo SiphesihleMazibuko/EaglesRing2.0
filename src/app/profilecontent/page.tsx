@@ -115,8 +115,9 @@ export function Profile() {
               <div className="grid gap-2">
                 <Label htmlFor="avatar">Avatar</Label>
                 <Avatar>
+                  {/* Safely accessing the image with a fallback */}
                   <AvatarImage
-                    src={session?.user?.image || "/placeholder-user.jpg"}
+                    src={session?.user?.avatarImage || "/placeholder-user.jpg"}
                   />
                   <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
@@ -127,7 +128,7 @@ export function Profile() {
                   id="fullName"
                   className="bg-neutral-50 p-2 rounded font-bold"
                 >
-                  {session?.user?.name}
+                  {session?.user?.name || "No Name Available"}
                 </span>
               </div>
               <div className="grid gap-2">
@@ -145,7 +146,7 @@ export function Profile() {
                   id="userType"
                   className="bg-neutral-50 p-2 rounded font-bold"
                 >
-                  {session?.user?.userType}
+                  {session?.user?.userType || "N/A"}
                 </span>
               </div>
             </div>

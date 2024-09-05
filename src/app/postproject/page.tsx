@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useUser } from "@/lib/UserContext";
+import Image from "next/image"; // Importing next/image for optimized images
 
 interface Project {
   _id: string;
@@ -195,24 +196,46 @@ function PostProject() {
 
             <div>
               <Select onValueChange={handleSelectChange}>
-                <SelectTrigger className="w-[280px]">
+                <SelectTrigger className="w-[280px] bg-card text-card-foreground">
                   <SelectValue placeholder="Select an option" />
                 </SelectTrigger>
                 <SelectContent side="bottom" sideOffset={5}>
-                  <SelectGroup>
-                    <SelectItem value="Initial Phase">Initial Phase</SelectItem>
-                    <SelectItem value="Startup Phase">Startup Phase</SelectItem>
-                    <SelectItem value="Growth Phase">Growth Phase</SelectItem>
-                    <SelectItem value="Maturity Phase">
-                      Maturity Phase
-                    </SelectItem>
-                    <SelectItem value="Expansion Phase">
-                      Expansion Phase
-                    </SelectItem>
-                    <SelectItem value="Decline Phase">
-                      Decline/Renewal Phase
-                    </SelectItem>
-                  </SelectGroup>
+                  <SelectItem
+                    value="Initial Phase"
+                    className="bg-card text-card-foreground"
+                  >
+                    Initial Phase
+                  </SelectItem>
+                  <SelectItem
+                    value="Startup Phase"
+                    className="bg-card text-card-foreground"
+                  >
+                    Startup Phase
+                  </SelectItem>
+                  <SelectItem
+                    value="Growth Phase"
+                    className="bg-card text-card-foreground"
+                  >
+                    Growth Phase
+                  </SelectItem>
+                  <SelectItem
+                    value="Maturity Phase"
+                    className="bg-card text-card-foreground"
+                  >
+                    Maturity Phase
+                  </SelectItem>
+                  <SelectItem
+                    value="Expansion Phase"
+                    className="bg-card text-card-foreground"
+                  >
+                    Expansion Phase
+                  </SelectItem>
+                  <SelectItem
+                    value="Decline Phase"
+                    className="bg-card text-card-foreground"
+                  >
+                    Decline/Renewal Phase
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -250,10 +273,13 @@ function PostProject() {
                       </video>
                     )}
                     {project.projectImage && (
-                      <img
+                      <Image
                         src={project.projectImage}
                         alt={`${project.companyName} Image`}
+                        width={400}
+                        height={300}
                         className="mt-2 w-full h-40 object-cover"
+                        priority={true} // Optional: for better performance
                       />
                     )}
                   </div>

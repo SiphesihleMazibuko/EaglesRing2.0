@@ -1,4 +1,4 @@
-import nextConnect from 'next-connect';
+import { default as nextConnect } from 'next-connect';
 import multer from 'multer';
 import { getSession } from 'next-auth/react';
 import connectMongoDB from '@/lib/mongodb'; 
@@ -8,7 +8,7 @@ const upload = multer({
   storage: multer.memoryStorage(),
 });
 
-const apiRoute = nextConnect({
+const handler = nextConnect({
   onError(error, req, res) {
     res.status(501).json({ error: `Something went wrong! ${error.message}` });
   },
@@ -17,12 +17,13 @@ const apiRoute = nextConnect({
   },
 });
 
-apiRoute.use(upload.single('file'));
 
-apiRoute.post(async (req, res) => {
+handler.use(upload.single('file'));
+
+export const POST = async (req, res) => {
   const session = await getSession({ req });
   if (!session) {
-    return res.status(401).end(); 
+    return res.status(401).end();
   }
 
   const { email, id, company, tax } = req.body;
@@ -42,7 +43,7 @@ apiRoute.post(async (req, res) => {
         id: id,
         company: company,
         tax: tax,
-        file: fileData, 
+        file: fileData,
       },
       { upsert: true, new: true }
     );
@@ -56,6 +57,6 @@ apiRoute.post(async (req, res) => {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
-});
+};
 
-export default apiRoute;
+
