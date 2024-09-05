@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Navbar from "../navbar/page";
-import Slider from "../slider/page";
 import Footer from "../footer/page";
 
 const homepage = () => {
@@ -109,16 +108,6 @@ const homepage = () => {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
-          </div>
-        </div>
-        <div className="w-full mt-12">
-          <h3 className="text-3xl font-semibold mb-4 text-center text-gray-950">
-            Latest Business Events
-          </h3>
-          <div className="flex justify-center">
-            <div className="w-4/5">
-              <Slider />
-            </div>
           </div>
         </div>
       </div>

@@ -41,23 +41,6 @@ function PostProject() {
 
   const [userProjects, setUserProjects] = useState<Project[]>([]);
 
-  // Fetch user's previously posted projects on page load
-  useEffect(() => {
-    const fetchUserProjects = async () => {
-      if (!email) return;
-
-      try {
-        const response = await fetch(`/api/getUserProject?email=${email}`);
-        const data = await response.json();
-        setUserProjects(data);
-      } catch (error) {
-        console.error("Error fetching user projects:", error);
-      }
-    };
-
-    fetchUserProjects();
-  }, [email]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
     setFormData((prev) => ({
