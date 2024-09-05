@@ -1,4 +1,4 @@
-import { default as nextConnect } from 'next-connect';
+import nextConnect from 'next-connect';
 import multer from 'multer';
 import { getSession } from 'next-auth/react';
 import connectMongoDB from '@/lib/mongodb'; 
@@ -16,7 +16,6 @@ const handler = nextConnect({
     res.status(405).json({ error: `Method ${req.method} not allowed` });
   },
 });
-
 
 handler.use(upload.single('file'));
 
@@ -58,5 +57,3 @@ export const POST = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
