@@ -21,84 +21,12 @@ import InvestorNavbar from "../investornavbar/page";
 export function Profile() {
   const { data: session } = useSession();
   const [email, setEmail] = useState<string>("");
-  const [id, setId] = useState<string>("");
-  const [company, setCompany] = useState<string>("");
-  const [tax, setTax] = useState<string>("");
-  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (session?.user?.email) {
       setEmail(session.user.email);
     }
   }, [session]);
-
-  const handleSaveChanges = async () => {
-    let valid = true;
-
-    if (!id.match(/^\d{13}$/)) {
-      toast.error("ID Number must be exactly 13 numeric characters");
-      valid = false;
-    }
-    if (company.trim() === "") {
-      toast.error("Company Name is required");
-      valid = false;
-    }
-    if (!tax.match(/^\d{13}$/)) {
-      toast.error("Tax Number must be exactly 13 numeric characters");
-      valid = false;
-    }
-    if (!file) {
-      toast.error("Document upload is required");
-      valid = false;
-    }
-
-    if (valid) {
-      try {
-        const formData = new FormData();
-        formData.append("email", email);
-        formData.append("id", id);
-        formData.append("company", company);
-        formData.append("tax", tax);
-        if (file) {
-          formData.append("file", file);
-        }
-
-        const response = await fetch("/api/updateProfile", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          toast.success("Profile updated successfully!");
-        } else {
-          toast.error(data.message);
-        }
-      } catch (error) {
-        toast.error("Failed to update profile");
-      }
-    }
-  };
-
-  const handleFileUpload = () => {
-    let valid = true;
-
-    if (!file) {
-      toast.error("Documents required");
-      valid = false;
-    }
-
-    if (valid) {
-      console.log(file);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
-    }
-  };
 
   return (
     <div className="background-container min-h-screen">
@@ -108,7 +36,6 @@ export function Profile() {
         <Card className="w-full max-w-3xl mx-auto">
           <CardHeader>
             <CardTitle>Profile</CardTitle>
-            <CardDescription>Update your company information</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-6">
             <div className="grid grid-cols-2 gap-6">
@@ -150,64 +77,7 @@ export function Profile() {
                 </span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="id">ID Number</Label>
-                <Input
-                  id="id"
-                  value={id}
-                  onChange={(e) => setId(e.target.value)}
-                  className="bg-neutral-50"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="company">Company Name</Label>
-                <Input
-                  id="company"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  className="bg-neutral-50"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="tax">Tax Number</Label>
-                <Input
-                  id="tax"
-                  value={tax}
-                  onChange={(e) => setTax(e.target.value)}
-                  className="bg-neutral-50"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="documents">Upload Documents</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="documents"
-                    type="file"
-                    onChange={handleFileChange}
-                  />
-                  <Button
-                    onClick={handleFileUpload}
-                    className="hover:underline"
-                  >
-                    Upload
-                  </Button>
-                </div>
-              </div>
-            </div>
           </CardContent>
-          <CardFooter>
-            <div className="flex justify-end">
-              <Button
-                onClick={handleSaveChanges}
-                className="text-white font-bold text-sm py-2 px-8 rounded cursor-pointer transition-all ease-in-out duration-300 hover:text-[#917953] hover:bg-black hover:outline-[#917953] outline-none bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
-              >
-                Save Changes
-              </Button>
-            </div>
-          </CardFooter>
         </Card>
       </div>
     </div>
