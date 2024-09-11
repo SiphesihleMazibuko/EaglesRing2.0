@@ -13,43 +13,50 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import "react-toastify/dist/ReactToastify.css";
+import { useSession } from "next-auth/react";
 
 interface Pitch {
   _id: string;
+  entrepreneurId: string;
   companyName: string;
   projectIdea: string;
   pitchVideo: string;
   businessPhase: string;
   createdAt: string;
+  status: string; // Add the connection status from backend
 }
 
 interface PitchState {
   isExpanded: boolean;
   isConnected: boolean;
+  status: string; // Track the status (pending, accepted, declined)
 }
 
 const Page = () => {
+  const { data: session } = useSession();
   const [pitches, setPitches] = useState<Pitch[]>([]);
   const [pitchStates, setPitchStates] = useState<{ [key: string]: PitchState }>(
     {}
   );
-  const [selectedPhase, setSelectedPhase] = useState<string>(""); // State for filtering by phase
-  const [sortOrder, setSortOrder] = useState<string>("newest"); // State for sorting order
+  const [selectedPhase, setSelectedPhase] = useState<string>(""); 
+  const [sortOrder, setSortOrder] = useState<string>("newest"); 
 
   useEffect(() => {
     const fetchPitches = async () => {
+      const investorId = session?.user?.id; 
       try {
-        const response = await fetch("/api/getProject");
+        const response = await fetch(
+          `/api/getProject?investorId=${investorId}`
+        );
         const data = await response.json();
-        console.log("Fetched Pitches in Frontend:", data);
-        setPitches(data);
+        setPitches(data); 
       } catch (error) {
         console.error("Error fetching pitches:", error);
       }
     };
 
     fetchPitches();
-  }, []);
+  }, [session?.user?.id]);
 
   const toggleReadMore = (id: string) => {
     setPitchStates((prevStates) => ({
@@ -61,15 +68,37 @@ const Page = () => {
     }));
   };
 
-  const handleConnect = (id: string) => {
-    toast.info("Connection request sent! Waiting for approval.");
-    setPitchStates((prevStates) => ({
-      ...prevStates,
-      [id]: {
-        ...prevStates[id],
-        isConnected: true,
-      },
-    }));
+  const handleConnect = async (pitch: Pitch) => {
+    try {
+      const response = await fetch("/api/connectInvestor", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          investorId: session?.user?.id,
+          entrepreneurId: pitch.entrepreneurId,
+          pitchId: pitch._id,
+        }),
+      });
+
+      if (response.ok) {
+        toast.info("Connection request sent! Waiting for approval.");
+        setPitchStates((prevStates) => ({
+          ...prevStates,
+          [pitch._id]: {
+            ...prevStates[pitch._id],
+            isConnected: true,
+            status: "pending", 
+          },
+        }));
+      } else {
+        toast.error("Failed to send connection request.");
+      }
+    } catch (error) {
+      console.error("Error sending connection request:", error);
+      toast.error("An error occurred. Please try again.");
+    }
   };
 
   const filteredPitches = pitches
@@ -181,7 +210,8 @@ const Page = () => {
             {filteredPitches.map((pitch) => {
               const pitchState = pitchStates[pitch._id] || {
                 isExpanded: false,
-                isConnected: false,
+                isConnected: pitch.status !== "pending", // Use status to check if connected
+                status: pitch.status || "pending", // Use status from the backend
               };
 
               const createdAtDate = new Date(
@@ -229,12 +259,14 @@ const Page = () => {
                               ? "bg-gray-400 cursor-not-allowed"
                               : "hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
                           }`}
-                          onClick={() => handleConnect(pitch._id)}
+                          onClick={() => handleConnect(pitch)} // Pass the whole pitch object
                           disabled={pitchState.isConnected}
                         >
-                          {pitchState.isConnected
+                          {pitchState.status === "pending"
                             ? "Pending Approval"
-                            : "Connect"}
+                            : pitchState.status === "accepted"
+                            ? "Connected"
+                            : "Declined"}
                         </Button>
                       </div>
                       <div>
