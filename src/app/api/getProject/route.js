@@ -1,6 +1,6 @@
 import connectToDatabase from '@/lib/mongodb';
 import Pitch from '@/models/pitch';
-import Notification from '@/models/notification'; // Import your Notification model
+import Notification from '@/models/notification'; 
 
 export async function GET(req) {
   try {

@@ -1,3 +1,4 @@
+// models/notification.js
 import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema({
@@ -5,6 +6,7 @@ const notificationSchema = new mongoose.Schema({
   entrepreneurId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   pitchId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pitch', required: true },
   status: { type: String, enum: ['pending', 'accepted', 'declined'], default: 'pending' },
+  read: { type: Boolean, default: false }, 
   createdAt: { type: Date, default: Date.now },
 });
 
