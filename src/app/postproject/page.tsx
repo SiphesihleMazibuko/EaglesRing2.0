@@ -89,7 +89,6 @@ function PostProject() {
       return;
     }
 
-    // Save project data in sessionStorage
     const payload = {
       email,
       companyName: formData.companyName,

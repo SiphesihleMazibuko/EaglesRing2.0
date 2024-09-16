@@ -23,9 +23,11 @@ export default function PaymentSuccess({
   return (
     <main className="max-w-6xl mx-auto p-10 text-input text-center border m-10 rounded-md bg-gradient-to-tr from-[#917953] to-[#CBAC7C]">
       <div className="mb-10">
-        <h1 className="text-4xl">Thank you! Your project has been posted</h1>
+        <h1 className="text-4xl font-extrabold mb-2">
+          Thank you! Your project has been posted
+        </h1>
         <h2 className="text-2xl">You successfully paid</h2>
-        <div className="bg-input p-2 rounded-md text-secondary mt-5 text-4xl font-bold">
+        <div className="bg-input p-2 rounded-md text-neutral-950 mt-5 text-4xl font-bold">
           R{amount}
         </div>
         <Button type="submit" onClick={() => router.push("/postproject")}>
