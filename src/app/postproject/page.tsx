@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Navbar from "../navbar/page";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -9,13 +9,13 @@ import "react-toastify/dist/ReactToastify.css";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { useUser } from "@/lib/UserContext";
-import Image from "next/image"; // Importing next/image for optimized images
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Project {
   _id: string;
@@ -30,6 +30,7 @@ interface Project {
 function PostProject() {
   const { user } = useUser();
   const email = user?.email;
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     companyName: "",
@@ -56,6 +57,26 @@ function PostProject() {
     }));
   };
 
+  const redirectToCheckOut = async () => {
+    try {
+      const response = await fetch("/api/create-payment-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, amount: 149.99 * 100 }),
+      });
+      const { clientSecret } = await response.json();
+      if (clientSecret) {
+        router.push("/payment");
+      } else {
+        toast.error("Failed to redirect to checkout.");
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -68,44 +89,20 @@ function PostProject() {
       return;
     }
 
-    try {
-      const payload = {
-        email,
-        companyName: formData.companyName,
-        projectIdea: formData.projectIdea,
-        businessPhase: formData.businessPhase,
-        image: formData.image ? URL.createObjectURL(formData.image) : null,
-        video: formData.video ? URL.createObjectURL(formData.video) : null,
-      };
+    // Save project data in sessionStorage
+    const payload = {
+      email,
+      companyName: formData.companyName,
+      projectIdea: formData.projectIdea,
+      businessPhase: formData.businessPhase,
+      image: formData.image ? URL.createObjectURL(formData.image) : null,
+      video: formData.video ? URL.createObjectURL(formData.video) : null,
+    };
 
-      const response = await fetch("/api/saveProject", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+    sessionStorage.setItem("projectData", JSON.stringify(payload));
+    console.log("Data:", payload);
 
-      if (response.ok) {
-        toast.success("Project posted successfully!");
-
-        setFormData({
-          companyName: "",
-          projectIdea: "",
-          image: null,
-          video: null,
-          businessPhase: "",
-        });
-
-        const updatedProjects = await response.json();
-        setUserProjects((prevProjects) => [...prevProjects, updatedProjects]);
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Failed to post project.");
-      }
-    } catch (error) {
-      toast.error("An error occurred. Please try again.");
-    }
+    await redirectToCheckOut();
   };
 
   return (
@@ -262,7 +259,7 @@ function PostProject() {
                         width={400}
                         height={300}
                         className="mt-2 w-full h-40 object-cover"
-                        priority={true} // Optional: for better performance
+                        priority={true}
                       />
                     )}
                   </div>
