@@ -28,6 +28,8 @@ export default function Component() {
   const [company, setCompany] = useState("");
   const [idnum, setIdnum] = useState("");
   const [errors, setErrors] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordStrengthLabel, setPasswordStrengthLabel] = useState("");
   const [avatarImage, setAvatarImage] = useState("/placeholder-user.jpg");
   const router = useRouter();
 
@@ -40,6 +42,41 @@ export default function Component() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handlePasswordStrength = (password: any) => {
+    let strength = 0;
+
+    if (password.length > 0) strength++;
+    if (password.length >= 6) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[@$!%*?&]/.test(password)) strength++;
+
+    setPasswordStrength(strength);
+
+    switch (strength) {
+      case 1:
+        setPasswordStrengthLabel("Very Weak");
+        break;
+      case 2:
+        setPasswordStrengthLabel("Weak");
+        break;
+      case 3:
+        setPasswordStrengthLabel("Strong");
+        break;
+      case 4:
+      case 5:
+        setPasswordStrengthLabel("Very Strong");
+        break;
+      default:
+        setPasswordStrengthLabel("");
+    }
+  };
+  const handlePasswordChange = (e: { target: { value: any } }) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    handlePasswordStrength(newPassword);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -59,10 +96,20 @@ export default function Component() {
       toast.error("All fields are required");
       return;
     }
+    if (!termsAccepted) {
+      setErrors("You must agree to the terms and conditions");
+      toast.error("You must agree to the terms and conditions");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setErrors("Passwords do not match");
       toast.error("Passwords do not match");
+      return;
+    }
+    if (tax.length < 13 || tax.length > 13) {
+      setErrors("Tax number must be 13 digits");
+      toast.error("Tax number must be 13 digits");
       return;
     }
     if (idnum.length < 13 || idnum.length > 13) {
@@ -231,13 +278,14 @@ export default function Component() {
             </SelectContent>
           </Select>
           <div className="relative">
+            {/*Password field */}
             <Input
               name="password"
               placeholder="Password"
               type={showPassword ? "text" : "password"}
               className="bg-card text-card-foreground pr-8"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
             />
             <Button
               type="button"
@@ -250,6 +298,28 @@ export default function Component() {
               <span className="sr-only">Toggle password visibility</span>
             </Button>
           </div>
+
+          {/* Password strength bar */}
+          <div className="relative h-2 w-full bg-gray-300 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                passwordStrength === 1
+                  ? "bg-warning w-1/4"
+                  : passwordStrength === 2
+                  ? "bg-yellow-400 w-1/2"
+                  : passwordStrength === 3
+                  ? "bg-info w-3/4"
+                  : passwordStrength >= 4
+                  ? "bg-success w-full"
+                  : "w-0"
+              }`}
+            />
+          </div>
+          <p className="mt-2 text-center text-sm font-medium text-gray-600">
+            {passwordStrengthLabel}
+          </p>
+
+          {/* Confirm password */}
           <div className="relative">
             <Input
               name="confirmPassword"
