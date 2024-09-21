@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../navbar/page";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -42,11 +42,49 @@ function PostProject() {
 
   const [userProjects, setUserProjects] = useState<Project[]>([]);
 
+  useEffect(() => {
+    const fetchUserProjects = async () => {
+      if (email) {
+        try {
+          const response = await fetch(`/api/getEntrepreneurProject`);
+          const data = await response.json();
+          if (response.ok) {
+            setUserProjects(data);
+          } else {
+            toast.error("Failed to fetch projects.");
+          }
+        } catch (error) {
+          toast.error("An error occurred while fetching projects.");
+        }
+      }
+    };
+
+    fetchUserProjects();
+  }, [email]);
+
+  const handleDelete = async (pitchId: string) => {
+    try {
+      const response = await fetch(`/api/deletePitch?pitchId=${pitchId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        toast.success("Pitch deleted successfully!");
+        setUserProjects((prevProjects) =>
+          prevProjects.filter((proj) => proj._id !== pitchId)
+        );
+      } else {
+        toast.error("Failed to delete pitch.");
+      }
+    } catch (error) {
+      toast.error("An error occurred while deleting the pitch.");
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value,
+      [name]: files ? files[0] : value, // Capture file for file inputs, else capture value
     }));
   };
 
@@ -58,26 +96,10 @@ function PostProject() {
   };
 
   const redirectToCheckOut = async () => {
-    try {
-      const response = await fetch("/api/create-payment-intent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, amount: 149.99 * 100 }),
-      });
-      const { clientSecret } = await response.json();
-      if (clientSecret) {
-        router.push("/payment");
-      } else {
-        toast.error("Failed to redirect to checkout.");
-      }
-    } catch (error) {
-      toast.error("An error occurred. Please try again.");
-    }
+    // Save project data to FormData for file handling
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     if (
@@ -89,19 +111,27 @@ function PostProject() {
       return;
     }
 
-    const payload = {
-      email,
-      companyName: formData.companyName,
-      projectIdea: formData.projectIdea,
-      businessPhase: formData.businessPhase,
-      image: formData.image ? URL.createObjectURL(formData.image) : null,
-      video: formData.video ? URL.createObjectURL(formData.video) : null,
-    };
+    const projectData = new FormData();
+    projectData.append("companyName", formData.companyName);
+    projectData.append("projectIdea", formData.projectIdea);
+    projectData.append("businessPhase", formData.businessPhase);
+    if (formData.image) projectData.append("image", formData.image);
+    if (formData.video) projectData.append("video", formData.video);
 
-    sessionStorage.setItem("projectData", JSON.stringify(payload));
-    console.log("Data:", payload);
+    try {
+      const response = await fetch("/api/saveProject", {
+        method: "POST",
+        body: projectData, // Use FormData to include files
+      });
 
-    await redirectToCheckOut();
+      if (response.ok) {
+        toast.success("Pitch posted");
+      } else {
+        toast.error("An error occurred. Please try again.");
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -153,7 +183,7 @@ function PostProject() {
                   id="image"
                   name="image"
                   accept="image/*"
-                  onChange={handleChange}
+                  onChange={handleChange} // handleChange will capture the image file
                 />
               </div>
               <div className="grid gap-2">
@@ -168,7 +198,7 @@ function PostProject() {
                   id="video"
                   name="video"
                   accept="video/*"
-                  onChange={handleChange}
+                  onChange={handleChange} // handleChange will capture the video file
                 />
               </div>
             </div>
@@ -261,6 +291,12 @@ function PostProject() {
                         priority={true}
                       />
                     )}
+                    <button
+                      onClick={() => handleDelete(project._id)}
+                      className="mt-4 bg-red-500 text-white py-2 px-4 rounded-lg"
+                    >
+                      Delete
+                    </button>
                   </div>
                 ))}
               </div>

@@ -27,6 +27,7 @@ export default function Component() {
   const [tax, setTax] = useState("");
   const [company, setCompany] = useState("");
   const [idnum, setIdnum] = useState("");
+  const [idType, setIdType] = useState("ID");
   const [errors, setErrors] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordStrengthLabel, setPasswordStrengthLabel] = useState("");
@@ -73,6 +74,7 @@ export default function Component() {
         setPasswordStrengthLabel("");
     }
   };
+
   const handlePasswordChange = (e: { target: { value: any } }) => {
     const newPassword = e.target.value;
     setPassword(newPassword);
@@ -107,14 +109,22 @@ export default function Component() {
       toast.error("Passwords do not match");
       return;
     }
-    if (tax.length < 13 || tax.length > 13) {
+
+    if (tax.length !== 13) {
       setErrors("Tax number must be 13 digits");
       toast.error("Tax number must be 13 digits");
       return;
     }
-    if (idnum.length < 13 || idnum.length > 13) {
+
+    if (idType === "ID" && (idnum.length !== 13 || isNaN(Number(idnum)))) {
       setErrors("ID number must be 13 digits");
       toast.error("ID number must be 13 digits");
+      return;
+    }
+
+    if (idType === "Passport" && !/^[a-zA-Z0-9]{5,10}$/.test(idnum)) {
+      setErrors("Passport number must be 5 to 10 alphanumeric characters");
+      toast.error("Passport number must be valid");
       return;
     }
 
@@ -149,6 +159,7 @@ export default function Component() {
           tax,
           company,
           idnum,
+          idType,
         }),
       });
 
@@ -178,7 +189,7 @@ export default function Component() {
   return (
     <div className="flex justify-center py-12 bg-background min-h-screen">
       <ToastContainer />
-      <div className="w-full max-w-sm p-8 bg-card rounded-lg shadow-lg border border-border">
+      <div className="w-full max-w-sm p-8 bg-card rounded-lg shadow-lg border border-border flex flex-col space-y-4">
         <h1 className="text-3xl font-bold text-center text-card-foreground mb-6">
           Registration
         </h1>
@@ -200,7 +211,7 @@ export default function Component() {
             </label>
           </Button>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 flex flex-col">
           <div className="relative">
             <UserIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
@@ -244,17 +255,31 @@ export default function Component() {
               onChange={(e) => setCompany(e.target.value)}
             />
           </div>
+
+          {/* ID or Passport Type Selector */}
+          <Select value={idType} onValueChange={(value) => setIdType(value)}>
+            <SelectTrigger id="idType" className="bg-card text-card-foreground">
+              <SelectValue placeholder="Select ID or Passport" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ID">ID Number</SelectItem>
+              <SelectItem value="Passport">Passport Number</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* ID or Passport Input */}
           <div className="relative">
             <UserIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               name="id"
-              placeholder="id"
+              placeholder={idType === "ID" ? "ID number" : "Passport number"}
               type="text"
               className="bg-card text-card-foreground pr-8"
               value={idnum}
               onChange={(e) => setIdnum(e.target.value)}
             />
           </div>
+
           <Select
             value={userType}
             onValueChange={(value) => setUserType(value)}
@@ -277,8 +302,9 @@ export default function Component() {
               </SelectItem>
             </SelectContent>
           </Select>
+
+          {/* Password Input */}
           <div className="relative">
-            {/*Password field */}
             <Input
               name="password"
               placeholder="Password"
@@ -319,7 +345,7 @@ export default function Component() {
             {passwordStrengthLabel}
           </p>
 
-          {/* Confirm password */}
+          {/* Confirm Password */}
           <div className="relative">
             <Input
               name="confirmPassword"
@@ -452,26 +478,6 @@ function UserIcon(
     >
       <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function XIcon(props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
     </svg>
   );
 }

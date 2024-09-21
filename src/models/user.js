@@ -24,10 +24,28 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    idType: {
+      type: String,
+      enum: ['ID', 'Passport'], // Ensure that the type is either ID or Passport
+      required: true,
+    },
     idnum: {
       type: String,
       required: true,
-      match: [/^\d{13}$/, "ID Number must be exactly 13 numeric characters."],
+      validate: {
+        validator: function (value) {
+          if (this.idType === 'ID') {
+            return /^\d{13}$/.test(value); // ID number must be 13 digits
+          } else if (this.idType === 'Passport') {
+            return /^[a-zA-Z0-9]{5,10}$/.test(value); // Passport number must be 5-10 alphanumeric characters
+          }
+          return false;
+        },
+        message: (props) =>
+          props.value.length === 13
+            ? "ID Number must be exactly 13 digits."
+            : "Passport Number must be 5 to 10 alphanumeric characters.",
+      },
     },
     company: {
       type: String,

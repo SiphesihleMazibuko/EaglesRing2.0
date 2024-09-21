@@ -5,8 +5,9 @@ import {
   useElements,
   PaymentElement,
 } from "@stripe/react-stripe-js";
-import convertToSubcurrency from "@/lib/convertToSubcurrency";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import convertToSubcurrency from "@/lib/convertToSubcurrency";
 
 const CheckOutPage = ({ amount }: { amount: number }) => {
   const stripe = useStripe();
@@ -14,14 +15,16 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
+    console.log("Fetching clientSecret for payment intent...");
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ amount: convertToSubcurrency(amount) }),
+      body: JSON.stringify({ amount: convertToSubcurrency(amount) }), // Pass the converted amount
     })
       .then((res) => res.json())
       .then((data) => {
@@ -49,8 +52,22 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
       return;
     }
 
-    // Submit payment through Stripe
-    const { error: submitError } = await elements.submit();
+    const result = await elements.submit();
+
+    if (result.error) {
+      setErrorMessage(result.error.message);
+      setLoading(false);
+      return;
+    }
+
+    const { error: submitError } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/payment-success`,
+      },
+      clientSecret,
+      redirect: "if_required",
+    });
 
     if (submitError) {
       setErrorMessage(submitError.message);
@@ -58,42 +75,50 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
       return;
     }
 
-    // Confirm payment
-    const { error: confirmError } = await stripe.confirmPayment({
-      elements,
-      clientSecret,
-      confirmParams: {
-        return_url: `https://eagles-ring2-0.vercel.app/payment-success`,
-      },
-    });
-
-    if (confirmError) {
-      setErrorMessage(confirmError.message);
-      setLoading(false);
-      return;
-    }
-
-    const projectData = sessionStorage.getItem("projectData");
+    // Now the payment is complete, we post the project data
+    const projectData = sessionStorage.getItem("pendingProject");
 
     if (projectData) {
       try {
+        const parsedProjectData = JSON.parse(projectData);
+
+        const formData = new FormData();
+        formData.append("companyName", parsedProjectData.companyName);
+        formData.append("projectIdea", parsedProjectData.projectIdea);
+        formData.append("businessPhase", parsedProjectData.businessPhase);
+
+        // Directly handle files from sessionStorage if saved correctly in the previous step
+        const imageBlob = sessionStorage.getItem("pendingImage");
+        const videoBlob = sessionStorage.getItem("pendingVideo");
+
+        if (imageBlob) {
+          const imageFile = new Blob([imageBlob]); // Convert to Blob
+          formData.append("image", imageFile);
+        }
+
+        if (videoBlob) {
+          const videoFile = new Blob([videoBlob]); // Convert to Blob
+          formData.append("video", videoFile);
+        }
+
         const response = await fetch("/api/saveProject", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: projectData,
+          body: formData,
         });
 
-        if (response.ok) {
-          toast.success("Project posted successfully!");
-
-          sessionStorage.removeItem("projectData");
-        } else {
-          const errorData = await response.json();
-          toast.error(`Failed to post project: ${errorData.message}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Error response text:", errorText);
+          throw new Error(`Failed to post project: ${errorText}`);
         }
+
+        toast.success("Project posted successfully!");
+        sessionStorage.removeItem("pendingProject");
+        sessionStorage.removeItem("pendingImage");
+        sessionStorage.removeItem("pendingVideo");
+        router.push("/project-success");
       } catch (error) {
+        console.error("Error while posting project to API:", error);
         toast.error("An error occurred while posting the project.");
       }
     } else {
@@ -106,10 +131,7 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
   if (!clientSecret) {
     return (
       <div className="flex items-center justify-center">
-        <div
-          className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-none dark:text-input"
-          role="status"
-        >
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-none">
           <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
             Loading...
           </span>

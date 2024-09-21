@@ -18,9 +18,21 @@ const pitchSchema = new Schema(
     },
     projectImage: {
       type: String, 
+      validate: {
+        validator: function (v) {
+          return /\.(jpg|jpeg|png|gif)$/.test(v);  
+        },
+        message: 'Project image must be a valid image format.',
+      },
     },
     pitchVideo: {
       type: String,
+      validate: {
+        validator: function (v) {
+          return /\.(mp4|mov|avi)$/.test(v);  
+        },
+        message: 'Pitch video must be a valid video format.',
+      },
     },
     businessPhase: {
       type: String,

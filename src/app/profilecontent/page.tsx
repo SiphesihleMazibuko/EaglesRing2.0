@@ -9,21 +9,22 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button"; 
+import { Button } from "@/components/ui/button";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSession } from "next-auth/react";
 import InvestorNavbar from "../investornavbar/page";
 import Navbar from "../navbar/page";
+import DashboardPage from "../dashboard/page";
 
 interface Notification {
   _id: string;
   investorId: {
-    name: string;
+    fullName: string;
   };
   pitchId: {
     companyName: string;
-  };
+  } | null; // Allow null or undefined pitchId
   status: string;
   createdAt: string;
 }
@@ -44,9 +45,14 @@ export function Profile() {
           `/api/getNotifications?entrepreneurId=${session?.user?.id}`
         );
         const data = await response.json();
-        setNotifications(data);
+        if (Array.isArray(data)) {
+          setNotifications(data);
+        } else {
+          setNotifications([]);
+        }
       } catch (error) {
         console.error("Error fetching notifications:", error);
+        setNotifications([]);
       }
     };
 
@@ -87,7 +93,7 @@ export function Profile() {
   };
 
   return (
-    <div className="background-container min-h-screen">
+    <div className="background-container min-h-screen flex-1">
       {session?.user?.userType === "Investor" ? <InvestorNavbar /> : <Navbar />}
       <ToastContainer />
       <div className="flex flex-col items-center justify-center flex-grow py-10">
@@ -97,15 +103,6 @@ export function Profile() {
           </CardHeader>
           <CardContent className="grid gap-6">
             <div className="grid grid-cols-2 gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="avatar">Avatar</Label>
-                <Avatar>
-                  <AvatarImage
-                    src={session?.user?.avatarImage || "/placeholder-user.jpg"}
-                  />
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar>
-              </div>
               <div className="grid gap-2">
                 <Label htmlFor="fullName">Full Name</Label>
                 <span
@@ -144,9 +141,13 @@ export function Profile() {
                 <ul className="list-disc pl-5">
                   {notifications.map((notification) => (
                     <li key={notification._id} className="py-1">
-                      {notification?.investorId.name} wants to connect to view
-                      your pitch &quot;{notification.pitchId.companyName}&quot;.
-                      Status: <strong>{notification.status}</strong>
+                      {notification?.investorId?.fullName} wants to connect to
+                      view your pitch &quot;
+                      {notification?.pitchId?.companyName || "Unknown Pitch"}
+                      &quot;. Status:{" "}
+                      <span className="font-bold text-accent">
+                        {notification.status}
+                      </span>
                       <div className="mt-2">
                         {notification.status === "pending" && (
                           <>
@@ -177,6 +178,9 @@ export function Profile() {
             </div>
           </CardFooter>
         </Card>
+      </div>
+      <div className="flex flex-col items-center justify-center flex-grow py-10">
+        <DashboardPage />
       </div>
     </div>
   );
