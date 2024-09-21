@@ -38,18 +38,16 @@ const Page = () => {
   const [pitchStates, setPitchStates] = useState<{ [key: string]: PitchState }>(
     {}
   );
-  const [selectedPhase, setSelectedPhase] = useState<string>(""); 
-  const [sortOrder, setSortOrder] = useState<string>("newest"); 
+  const [selectedPhase, setSelectedPhase] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<string>("newest");
 
   useEffect(() => {
     const fetchPitches = async () => {
-      const investorId = session?.user?.id; 
+      const investorId = session?.user?.id;
       try {
-        const response = await fetch(
-          `/api/getProject?investorId=${investorId}`
-        );
+        const response = await fetch(`/api/getProject`);
         const data = await response.json();
-        setPitches(data); 
+        setPitches(data);
       } catch (error) {
         console.error("Error fetching pitches:", error);
       }
@@ -89,7 +87,7 @@ const Page = () => {
           [pitch._id]: {
             ...prevStates[pitch._id],
             isConnected: true,
-            status: "pending", 
+            status: "pending",
           },
         }));
       } else {
