@@ -1,10 +1,7 @@
 import Notification from '@/models/notification';
 import mongoose from 'mongoose';
 
-mongoose.connect(process.env.MONGODB_URI || '', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(process.env.MONGODB_URI || '');
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
