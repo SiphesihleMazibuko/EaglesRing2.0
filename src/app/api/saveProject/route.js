@@ -21,17 +21,17 @@ async function uploadToCloudinary(file) {
     const uploadStream = cloudinary.uploader.upload_stream(
       { folder: 'eagles_ring_projects', resource_type: 'auto' },
       (error, result) => {
-        if (error) return reject(error);
-        resolve(result);
+        if (error) return reject(error); // Log the error and reject the promise
+        resolve(result); // Resolve the promise with Cloudinary result
       }
     );
-
-    file.pipe(uploadStream);
+    file.pipe(uploadStream); // Pipe the file stream to Cloudinary
   });
 }
 
 export async function POST(req) {
   try {
+    // Parse form data
     const formData = await req.formData();
     const companyName = formData.get('companyName');
     const projectIdea = formData.get('projectIdea');
@@ -42,48 +42,64 @@ export async function POST(req) {
     // Connect to the database
     await connectToDatabase();
 
+    // Get the current session
     const session = await getServerSession({ req, ...authOptions });
     if (!session) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
+    // Find the user in the database
     const user = await User.findOne({ email: session.user.email });
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    // Convert file to buffer and upload to Cloudinary
+    // Initialize variables for Cloudinary URLs
     let projectImage = null;
     let pitchVideo = null;
 
+    // Handle image upload
     if (imageFile) {
-      const imageBuffer = Buffer.from(await imageFile.arrayBuffer()); // Convert to Buffer
-      const imageStream = bufferToStream(imageBuffer);
-      const imageUpload = await uploadToCloudinary(imageStream);
-      projectImage = imageUpload.secure_url; // Cloudinary image URL
+      try {
+        const imageBuffer = Buffer.from(await imageFile.arrayBuffer()); // Convert image to Buffer
+        const imageStream = bufferToStream(imageBuffer); // Convert buffer to stream
+        const imageUpload = await uploadToCloudinary(imageStream); // Upload to Cloudinary
+        projectImage = imageUpload.secure_url; // Get the Cloudinary image URL
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        return NextResponse.json({ message: 'Image upload failed', error: error.message }, { status: 500 });
+      }
     }
 
+    // Handle video upload
     if (videoFile) {
-      const videoBuffer = Buffer.from(await videoFile.arrayBuffer()); // Convert to Buffer
-      const videoStream = bufferToStream(videoBuffer);
-      const videoUpload = await uploadToCloudinary(videoStream);
-      pitchVideo = videoUpload.secure_url; // Cloudinary video URL
+      try {
+        const videoBuffer = Buffer.from(await videoFile.arrayBuffer()); // Convert video to Buffer
+        const videoStream = bufferToStream(videoBuffer); // Convert buffer to stream
+        const videoUpload = await uploadToCloudinary(videoStream); // Upload to Cloudinary
+        pitchVideo = videoUpload.secure_url; // Get the Cloudinary video URL
+      } catch (error) {
+        console.error('Error uploading video:', error);
+        return NextResponse.json({ message: 'Video upload failed', error: error.message }, { status: 500 });
+      }
     }
 
-    // Create a new pitch and save to MongoDB
+    // Create a new pitch and save it to MongoDB
     const newPitch = new Pitch({
       entrepreneurId: user._id,
       companyName,
       projectIdea,
       businessPhase,
-      projectImage,  // URL from Cloudinary
-      pitchVideo,    // URL from Cloudinary
+      projectImage,  // Cloudinary image URL
+      pitchVideo,    // Cloudinary video URL
     });
 
+    // Save the pitch to the database
     await newPitch.save();
 
     return NextResponse.json({ message: 'Project posted successfully!' }, { status: 200 });
   } catch (error) {
+    // Catch all errors and return a 500 response
     console.error('Error saving project:', error);
     return NextResponse.json({ message: 'Internal server error', error: error.message }, { status: 500 });
   }

@@ -2,6 +2,8 @@ import connectToDatabase from '@/lib/mongodb';
 import Pitch from '@/models/pitch';
 import Notification from '@/models/notification';
 
+export const dynamic = 'force-dynamic'; // Force dynamic behavior
+
 export async function GET(req) {
   try {
     // Connect to the database
@@ -10,9 +12,9 @@ export async function GET(req) {
     // Fetch all pitches and populate the entrepreneurId
     const pitches = await Pitch.find({}).populate('entrepreneurId').exec();
 
-    // Extract the investorId from the query parameters
-    const { searchParams } = new URL(req.url); // This is still valid to get query params in the Request object
-    const investorId = searchParams.get('investorId');
+    // Extract the investorId from the request's query parameters
+    const url = new URL(req.url);
+    const investorId = url.searchParams.get('investorId');
 
     // Process each pitch to determine its status
     const pitchesWithStatus = await Promise.all(
