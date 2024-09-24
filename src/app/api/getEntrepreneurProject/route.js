@@ -1,9 +1,12 @@
 import { getServerSession } from "next-auth";
-import authOptions  from "@/lib/authOptions";
+import authOptions from "@/lib/authOptions";
 import dbConnect from "@/lib/mongodb";
 import Pitch from "@/models/pitch";
 import { NextResponse } from "next/server";
 import User from "@/models/user"; // Assuming you have a User model
+
+// Force dynamic behavior
+export const dynamic = 'force-dynamic';
 
 // Named export for the GET method
 export async function GET(req) {
