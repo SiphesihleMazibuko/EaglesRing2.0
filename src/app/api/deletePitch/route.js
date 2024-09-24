@@ -1,47 +1,42 @@
-import dbConnect from "@/lib/mongodb";
-import Pitch from "@/models/pitch";
 import { getServerSession } from "next-auth";
 import authOptions from "@/lib/authOptions";
+import dbConnect from "@/lib/mongodb";
+import Pitch from "@/models/pitch";
+import { NextResponse } from "next/server"; // Import NextResponse for response handling
 
+// Named export for the DELETE method
 export async function DELETE(req) {
-  await dbConnect();
-  
   try {
-    const session = await getServerSession({ req, ...authOptions });
+    console.log("DELETE request received");
+
+    // Use getServerSession and pass the authOptions correctly
+    const session = await getServerSession(authOptions);
 
     if (!session) {
-      return new Response(JSON.stringify({ message: "Unauthorized" }), { status: 401 });
+      console.log("Unauthorized access attempt");
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const entrepreneur = await User.findOne({ email: session.user.email });
-    if (!entrepreneur) {
-      return new Response(JSON.stringify({ message: "Entrepreneur not found" }), { status: 404 });
-    }
+    const { pitchId } = await req.json();
+    console.log("Pitch ID to be deleted:", pitchId);
 
-    const { searchParams } = new URL(req.url);
-    const pitchId = searchParams.get("pitchId");
+    await dbConnect();
+    const entrepreneurId = session.user.id; // Assuming you have user ID in session
 
-    const pitch = await Pitch.findOne({ _id: pitchId, entrepreneurId: entrepreneur._id });
+    console.log("Checking ownership for entrepreneurId:", entrepreneurId);
+    const pitch = await Pitch.findOne({ _id: pitchId, entrepreneurId });
 
     if (!pitch) {
-      return new Response(JSON.stringify({ message: "Pitch not found or not owned by entrepreneur" }), { status: 404 });
+      console.log("Pitch not found or unauthorized delete attempt");
+      return NextResponse.json({ message: "Pitch not found" }, { status: 404 });
     }
 
-    await Pitch.deleteOne({ _id: pitchId });
+    await Pitch.findByIdAndDelete(pitchId);
+    console.log("Pitch deleted:", pitchId);
 
-    return new Response(JSON.stringify({ message: "Pitch deleted successfully" }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return NextResponse.json({ message: "Pitch deleted" }, { status: 200 });
   } catch (error) {
     console.error("Error deleting pitch:", error);
-    return new Response(JSON.stringify({ error: "Failed to delete pitch" }), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return NextResponse.json({ message: "Error deleting pitch" }, { status: 500 });
   }
 }

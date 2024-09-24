@@ -16,8 +16,10 @@ import {
 import { useUser } from "@/lib/UserContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 interface Project {
+  isExpanded: any;
   _id: string;
   companyName: string;
   projectIdea: string;
@@ -26,11 +28,17 @@ interface Project {
   projectImage: string | null;
   createdAt: string;
 }
+interface PitchState {
+  isExpanded: boolean;
+}
 
 function PostProject() {
   const { user } = useUser();
   const email = user?.email;
   const router = useRouter();
+  const [pitchStates, setPitchStates] = useState<{ [key: string]: PitchState }>(
+    {}
+  );
 
   const [formData, setFormData] = useState({
     companyName: "",
@@ -42,41 +50,46 @@ function PostProject() {
 
   const [userProjects, setUserProjects] = useState<Project[]>([]);
 
+  // Inside your useEffect function for fetching projects
   useEffect(() => {
     const fetchUserProjects = async () => {
-      if (email) {
-        try {
-          const response = await fetch(`/api/getEntrepreneurProject`);
+      try {
+        const response = await fetch("/api/getEntrepreneurProject");
+        if (response.ok) {
           const data = await response.json();
-          if (response.ok) {
-            setUserProjects(data);
-          } else {
-            toast.error("Failed to fetch projects.");
-          }
-        } catch (error) {
-          toast.error("An error occurred while fetching projects.");
+          setUserProjects(data);
+        } else {
+          toast.error("Error fetching projects");
         }
+      } catch (error) {
+        toast.error("Error fetching projects");
       }
     };
 
     fetchUserProjects();
-  }, [email]);
+  }, []);
 
+  // Inside handleDelete function
   const handleDelete = async (pitchId: string) => {
     try {
-      const response = await fetch(`/api/deletePitch?pitchId=${pitchId}`, {
+      const response = await fetch("/api/deletePitch", {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pitchId }),
       });
+
       if (response.ok) {
-        toast.success("Pitch deleted successfully!");
+        toast.success("Pitch deleted successfully");
         setUserProjects((prevProjects) =>
-          prevProjects.filter((proj) => proj._id !== pitchId)
+          prevProjects.filter((project) => project._id !== pitchId)
         );
       } else {
-        toast.error("Failed to delete pitch.");
+        toast.error("Error deleting pitch");
       }
     } catch (error) {
-      toast.error("An error occurred while deleting the pitch.");
+      toast.error("Error deleting pitch");
     }
   };
 
@@ -92,6 +105,15 @@ function PostProject() {
     setFormData((prev) => ({
       ...prev,
       businessPhase: value,
+    }));
+  };
+  const toggleReadMore = (id: string) => {
+    setPitchStates((prevStates) => ({
+      ...prevStates,
+      [id]: {
+        ...prevStates[id],
+        isExpanded: !prevStates[id]?.isExpanded,
+      },
     }));
   };
 
@@ -263,41 +285,75 @@ function PostProject() {
             {userProjects.length === 0 ? (
               <p>You haven&apos;t posted any projects yet.</p>
             ) : (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols- mt-10">
                 {userProjects.map((project) => (
-                  <div key={project._id} className="border p-4 rounded-lg">
-                    <h4 className="text-lg font-bold">{project.companyName}</h4>
-                    <p className="text-sm">{project.projectIdea}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(project.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </p>
-                    {project.pitchVideo && (
-                      <video controls className="mt-2" width="100%">
-                        <source src={project.pitchVideo} type="video/mp4" />
-                        Your browser does not support the video tag.
-                      </video>
-                    )}
-                    {project.projectImage && (
-                      <Image
-                        src={project.projectImage}
-                        alt={`${project.companyName} Image`}
-                        width={400}
-                        height={300}
-                        className="mt-2 w-full h-40 object-cover"
-                        priority={true}
-                      />
-                    )}
-                    <button
-                      onClick={() => handleDelete(project._id)}
-                      className="mt-4 bg-red-500 text-white py-2 px-4 rounded-lg"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  <Card key={project._id} className="border-0 shadow-sm">
+                    <CardContent className="p-0">
+                      {project.pitchVideo && (
+                        <video
+                          controls
+                          width={400}
+                          height={225}
+                          className="aspect-video object-cover"
+                        >
+                          <source src={project.pitchVideo} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      )}
+                    </CardContent>
+                    <CardFooter className="p-4">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div>
+                              <h4 className="text-sm font-medium">
+                                {project.companyName}
+                              </h4>
+                              <p className="text-xs text-muted-foreground">
+                                {project.businessPhase}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Created on:{" "}
+                                {new Date(project.createdAt).toLocaleDateString(
+                                  "en-UK",
+                                  {
+                                    year: "2-digit",
+                                    month: "2-digit",
+                                    day: "2-digit",
+                                  }
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="font-bold bg-destructive text-input text-sm py-2 px-5 ml-10 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 "
+                            onClick={() => handleDelete(project._id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            {project.projectIdea.length > 100
+                              ? `${project.projectIdea.slice(0, 100)}...`
+                              : project.projectIdea}
+                          </p>
+                          {project.projectIdea.length > 100 && (
+                            <Button
+                              variant="link"
+                              size="sm"
+                              className="p-0 mt-1 text-sm font-semibold text-blue-500 hover:underline"
+                              onClick={() => toggleReadMore(project._id)}
+                            >
+                              {project.isExpanded ? "Read Less" : "Read More"}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardFooter>
+                  </Card>
                 ))}
               </div>
             )}

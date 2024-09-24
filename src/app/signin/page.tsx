@@ -14,6 +14,7 @@ export default function Signin() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false); // Added loading state
 
   const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
@@ -23,9 +24,11 @@ export default function Signin() {
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    setLoading(true); // Set loading state to true on submit
 
     if (!email || !password) {
       toast.error("Please fill in all fields");
+      setLoading(false); // Reset loading if fields are missing
       return;
     }
 
@@ -38,6 +41,7 @@ export default function Signin() {
 
       if (!res) {
         toast.error("An error occurred during login");
+        setLoading(false); // Reset loading on error
         return;
       }
 
@@ -47,12 +51,16 @@ export default function Signin() {
           password: "Email or Password Incorrect",
         });
         toast.error("Email or Password Incorrect");
+        setLoading(false); // Reset loading on incorrect credentials
       } else {
         toast.success("Login successful");
         router.push("/api/auth/callback");
       }
     } catch (error) {
       toast.error("An error occurred during login");
+      setLoading(false); // Reset loading on exception
+    } finally {
+      setLoading(false); // Ensure loading is reset at the end of the process
     }
   };
 
@@ -107,8 +115,15 @@ export default function Signin() {
           <Button
             type="submit"
             className="w-full mt-6 transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]"
+            disabled={loading} // Disable button when loading
           >
-            Login
+            {loading ? (
+              <div className="flex justify-center items-center">
+                <span className="loader"></span> {/* Loading animation */}
+              </div>
+            ) : (
+              "Login"
+            )}
           </Button>
         </form>
         <div className="text-center mt-4">

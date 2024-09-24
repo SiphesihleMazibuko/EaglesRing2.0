@@ -24,7 +24,7 @@ interface Notification {
   };
   pitchId: {
     companyName: string;
-  } | null; // Allow null or undefined pitchId
+  } | null;
   status: string;
   createdAt: string;
 }

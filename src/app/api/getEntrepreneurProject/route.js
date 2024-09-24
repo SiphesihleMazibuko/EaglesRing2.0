@@ -1,40 +1,46 @@
-import connectToDatabase from '@/lib/mongodb';
-import Pitch from "@/models/pitch";
 import { getServerSession } from "next-auth";
-import authOptions from "@/lib/authOptions";
+import authOptions  from "@/lib/authOptions";
+import dbConnect from "@/lib/mongodb";
+import Pitch from "@/models/pitch";
+import { NextResponse } from "next/server";
+import User from "@/models/user"; // Assuming you have a User model
 
+// Named export for the GET method
 export async function GET(req) {
   try {
-    await connectToDatabase();
-    const session = await getServerSession({ req, authOptions });
+    console.log("GET request received");
+
+    // Use getServerSession to get the session
+    const session = await getServerSession(authOptions);
 
     if (!session) {
-      return new Response(JSON.stringify({ message: "Unauthorized" }), { status: 401 });
+      console.log("Unauthorized access attempt");
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    // Find the entrepreneur by session email
-    const entrepreneur = await User.findOne({ email: session.user.email });
+    await dbConnect();
 
-    if (!entrepreneur) {
-      return new Response(JSON.stringify({ message: "Entrepreneur not found" }), { status: 404 });
+    // Fetch the user from the database by email to get their entrepreneurId
+    const user = await User.findOne({ email: session.user.email });
+
+    if (!user) {
+      console.log("User not found");
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // Find all pitches by the entrepreneur
-    const pitches = await Pitch.find({ entrepreneurId: entrepreneur._id });
+    const entrepreneurId = user._id;
 
-    return new Response(JSON.stringify(pitches), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    console.log("Fetching projects for entrepreneurId:", entrepreneurId);
+    // Fetch pitches using entrepreneurId
+    const userPitches = await Pitch.find({ entrepreneurId });
+
+    console.log("User projects fetched:", userPitches);
+    return NextResponse.json(userPitches, { status: 200 });
   } catch (error) {
-    console.error("Error fetching pitches:", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch pitches" }), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    console.error("Error fetching projects:", error);
+    return NextResponse.json(
+      { message: "Error fetching projects", error },
+      { status: 500 }
+    );
   }
 }

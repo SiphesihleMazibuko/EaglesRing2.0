@@ -204,7 +204,7 @@ const Page = () => {
         {filteredPitches.length === 0 ? (
           <p>No pitches found.</p>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 mt-10">
             {filteredPitches.map((pitch) => {
               const pitchState = pitchStates[pitch._id] || {
                 isExpanded: false,
@@ -215,9 +215,9 @@ const Page = () => {
               const createdAtDate = new Date(
                 pitch.createdAt
               ).toLocaleDateString("en-UK", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
+                year: "2-digit",
+                month: "2-digit",
+                day: "2-digit",
               });
 
               return (
