@@ -14,7 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useUser } from "@/lib/UserContext";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
@@ -28,6 +27,7 @@ interface Project {
   projectImage: string | null;
   createdAt: string;
 }
+
 interface PitchState {
   isExpanded: boolean;
 }
@@ -50,7 +50,6 @@ function PostProject() {
 
   const [userProjects, setUserProjects] = useState<Project[]>([]);
 
-  // Inside your useEffect function for fetching projects
   useEffect(() => {
     const fetchUserProjects = async () => {
       try {
@@ -69,7 +68,6 @@ function PostProject() {
     fetchUserProjects();
   }, []);
 
-  // Inside handleDelete function
   const handleDelete = async (pitchId: string) => {
     try {
       const response = await fetch("/api/deletePitch", {
@@ -89,6 +87,7 @@ function PostProject() {
         toast.error("Error deleting pitch");
       }
     } catch (error) {
+      console.error("Delete error:", error);
       toast.error("Error deleting pitch");
     }
   };
@@ -107,6 +106,7 @@ function PostProject() {
       businessPhase: value,
     }));
   };
+
   const toggleReadMore = (id: string) => {
     setPitchStates((prevStates) => ({
       ...prevStates,
@@ -115,10 +115,6 @@ function PostProject() {
         isExpanded: !prevStates[id]?.isExpanded,
       },
     }));
-  };
-
-  const redirectToCheckOut = async () => {
-    // Save project data to FormData for file handling
   };
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -149,9 +145,12 @@ function PostProject() {
       if (response.ok) {
         toast.success("Pitch posted");
       } else {
+        const errorMessage = await response.text(); // Get the error message from the response
+        console.error("Response error:", errorMessage);
         toast.error("An error occurred. Please try again.");
       }
     } catch (error) {
+      console.error("Submit error:", error); // Log the error details
       toast.error("An error occurred. Please try again.");
     }
   };
