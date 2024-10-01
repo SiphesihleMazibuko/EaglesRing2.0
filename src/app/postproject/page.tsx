@@ -16,6 +16,7 @@ import {
 import { useUser } from "@/lib/UserContext";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import Loader from "@/components/ui/Loader";
 
 interface Project {
   isExpanded: any;
@@ -25,6 +26,7 @@ interface Project {
   businessPhase: string;
   pitchVideo: string | null;
   projectImage: string | null;
+  investmentAmount: string;
   createdAt: string;
 }
 
@@ -46,9 +48,11 @@ function PostProject() {
     image: null,
     video: null,
     businessPhase: "",
+    investmentAmount: "",
   });
 
   const [userProjects, setUserProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchUserProjects = async () => {
@@ -96,7 +100,7 @@ function PostProject() {
     const { name, value, files } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value, // Capture file for file inputs, else capture value
+      [name]: files ? files[0] : value,
     }));
   };
 
@@ -119,11 +123,13 @@ function PostProject() {
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    setLoading(true);
 
     if (
       !formData.companyName ||
       !formData.projectIdea ||
-      !formData.businessPhase
+      !formData.businessPhase ||
+      !formData.investmentAmount
     ) {
       toast.error("Please fill out all required fields.");
       return;
@@ -133,25 +139,29 @@ function PostProject() {
     projectData.append("companyName", formData.companyName);
     projectData.append("projectIdea", formData.projectIdea);
     projectData.append("businessPhase", formData.businessPhase);
+    projectData.append("investmentAmount", formData.investmentAmount);
     if (formData.image) projectData.append("image", formData.image);
     if (formData.video) projectData.append("video", formData.video);
 
     try {
       const response = await fetch("/api/saveProject", {
         method: "POST",
-        body: projectData, // Use FormData to include files
+        body: projectData,
       });
 
       if (response.ok) {
         toast.success("Pitch posted");
       } else {
-        const errorMessage = await response.text(); // Get the error message from the response
+        const errorMessage = await response.text();
         console.error("Response error:", errorMessage);
         toast.error("An error occurred. Please try again.");
       }
     } catch (error) {
-      console.error("Submit error:", error); // Log the error details
+      console.error("Submit error:", error);
       toast.error("An error occurred. Please try again.");
+      setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -224,10 +234,20 @@ function PostProject() {
               </div>
             </div>
 
-            <div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Input
+                type="number"
+                placeholder="Investment Amount"
+                name="investmentAmount"
+                value={formData.investmentAmount}
+                onChange={handleChange}
+                className="bg-muted text-neutral-950"
+                min="1"
+                required
+              />
               <Select onValueChange={handleSelectChange}>
-                <SelectTrigger className="w-[280px] bg-card text-card-foreground">
-                  <SelectValue placeholder="Select an option" />
+                <SelectTrigger className="w-full bg-card text-card-foreground">
+                  <SelectValue placeholder="Select Business Phase" />
                 </SelectTrigger>
                 <SelectContent side="bottom" sideOffset={5}>
                   <SelectItem
@@ -273,8 +293,18 @@ function PostProject() {
             <Button
               type="submit"
               className="ml-auto font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
+              disabled={loading}
             >
-              Post
+              {loading ? (
+                <>
+                  <span className="sr-only">Loading...</span>
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <Loader />
+                  </span>
+                </>
+              ) : (
+                "Post"
+              )}
             </Button>
           </form>
 

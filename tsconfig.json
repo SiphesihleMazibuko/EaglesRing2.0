@@ -30,6 +30,6 @@
     "src/app/api/update-profile.js",
     "middleware.js",
     "types"
-  ],
+, "src/app/checkout/page.js"  ],
   "exclude": ["node_modules"]
 }

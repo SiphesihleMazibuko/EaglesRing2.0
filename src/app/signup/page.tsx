@@ -15,6 +15,7 @@ import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/ui/Loader";
 
 export default function Component() {
   const [fullName, setFullName] = useState("");
@@ -33,6 +34,7 @@ export default function Component() {
   const [passwordStrengthLabel, setPasswordStrengthLabel] = useState("");
   const [avatarImage, setAvatarImage] = useState("/placeholder-user.jpg");
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -83,6 +85,7 @@ export default function Component() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
     if (
       !fullName ||
@@ -179,10 +182,12 @@ export default function Component() {
       } else {
         const data = await res.json();
         toast.error(data.message || "User registration failed");
+        setLoading(false);
       }
     } catch (error) {
       console.log("Error during registration", error);
       toast.error("Error during registration");
+      setLoading(false);
     }
   };
 
@@ -376,8 +381,18 @@ export default function Component() {
           <Button
             type="submit"
             className="w-full mt-6 transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]"
+            disabled={loading}
           >
-            Register
+            {loading ? (
+              <>
+                <span className="sr-only">Loading...</span>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <Loader />
+                </span>
+              </>
+            ) : (
+              "Register"
+            )}
           </Button>
         </form>
         <div className="text-center mt-4">

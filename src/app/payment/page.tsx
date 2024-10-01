@@ -1,5 +1,6 @@
 "use client";
 import CheckOutPage from "@/components/CheckOutPage";
+import Spinner from "@/components/ui/Spinner";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -38,7 +39,7 @@ export default function PaymentPage() {
   }, [amount]);
 
   if (status === "loading") {
-    return <p>Loading...</p>; // Optional: loading state
+    return <p>Loading...</p>;
   }
 
   const username = session?.user?.name || "Guest"; // Fallback to "Guest" if no name is available
@@ -63,7 +64,7 @@ export default function PaymentPage() {
           <CheckOutPage amount={amount} />
         </Elements>
       ) : (
-        <p>Loading payment details...</p> // Loading state while clientSecret is being fetched
+        <Spinner /> // Loading state while clientSecret is being fetched
       )}
     </main>
   );

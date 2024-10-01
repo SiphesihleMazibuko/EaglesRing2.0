@@ -1,6 +1,5 @@
 import mongoose, { Schema, models } from 'mongoose';
 
-
 const pitchSchema = new Schema(
   {
     entrepreneurId: {
@@ -12,6 +11,10 @@ const pitchSchema = new Schema(
       type: String,
       required: true,
     },
+    investmentAmount: {
+      type: String, 
+      required: true,
+    },
     projectIdea: {
       type: String,
       required: true,
@@ -20,18 +23,18 @@ const pitchSchema = new Schema(
       type: String, 
       validate: {
         validator: function (v) {
-          return /\.(jpg|jpeg|png|gif)$/.test(v);  
+          return /\.(jpg|jpeg|png|gif)$/.test(v) && /^https?:\/\/.+/.test(v);
         },
-        message: 'Project image must be a valid image format.',
+        message: 'Project image must be a valid URL and in jpg, jpeg, png, or gif format.',
       },
     },
     pitchVideo: {
       type: String,
       validate: {
         validator: function (v) {
-          return /\.(mp4|mov|avi)$/.test(v);  
+          return /\.(mp4|mov|avi)$/.test(v) && /^https?:\/\/.+/.test(v);
         },
-        message: 'Pitch video must be a valid video format.',
+        message: 'Pitch video must be a valid URL and in mp4, mov, or avi format.',
       },
     },
     businessPhase: {

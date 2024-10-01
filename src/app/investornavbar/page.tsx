@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { HiMenu, HiX } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
+import { signOut } from "next-auth/react";
 
 const InvestorNavbar = () => {
   const router = useRouter();
@@ -24,7 +25,7 @@ const InvestorNavbar = () => {
   };
 
   const handleSignOut = () => {
-    router.push("/onboarding");
+    signOut({ callbackUrl: "/signin" });
   };
 
   return (

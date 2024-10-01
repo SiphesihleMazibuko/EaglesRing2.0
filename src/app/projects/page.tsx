@@ -16,11 +16,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { useSession } from "next-auth/react";
 
 interface Pitch {
+  projectImage: string;
   _id: string;
   entrepreneurId: string;
   companyName: string;
   projectIdea: string;
   pitchVideo: string;
+  investmentAmount: string;
   businessPhase: string;
   createdAt: string;
   status: string; // Add the connection status from backend
@@ -222,22 +224,24 @@ const Page = () => {
 
               return (
                 <Card key={pitch._id} className="border-0 shadow-sm">
-                  <CardContent className="p-0">
-                    <video
-                      controls
-                      width={400}
-                      height={225}
-                      className="aspect-video object-cover"
-                    >
-                      <source src={pitch.pitchVideo} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  </CardContent>
-                  <CardFooter className="p-4">
-                    <div className="flex flex-col gap-2">
+                  <div
+                    tabIndex={0}
+                    className={`collapse collapse-arrow bg-input border ${
+                      pitchState.isExpanded ? "collapse-open" : ""
+                    }`}
+                    onClick={() => toggleReadMore(pitch._id)} // Toggle specific pitch collapse
+                  >
+                    <div className="collapse-title p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
+                          {/* Display pitch image as an icon */}
+                          <img
+                            src={pitch.projectImage}
+                            alt={`${pitch.companyName} logo`}
+                            className="w-12 h-12 object-cover rounded-badge"
+                          />
                           <div>
+                            {/* Company name, business phase, and created date */}
                             <h4 className="text-sm font-medium">
                               {pitch.companyName}
                             </h4>
@@ -245,14 +249,38 @@ const Page = () => {
                               {pitch.businessPhase}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              Created on: {createdAtDate}{" "}
+                              Created on: {createdAtDate}
+                            </p>
+
+                            {/* Display the investment amount */}
+                            <p className="text-sm text-neutral-950">
+                              Amount requested for: R{pitch.investmentAmount}
                             </p>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                    {/* Hidden content: video and project idea */}
+                    <div className="collapse-content p-4">
+                      <div className="flex flex-col gap-2">
+                        <video
+                          controls
+                          width={400}
+                          height={225}
+                          className="aspect-video object-cover"
+                        >
+                          <source src={pitch.pitchVideo} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {pitch.projectIdea}
+                        </p>
+
                         <Button
                           variant="secondary"
                           size="sm"
-                          className={`font-bold text-sm py-2 px-5 ml-10 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out ${
+                          className={`font-bold text-sm py-2 px-5 mt-4 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out ${
                             pitchState.isConnected
                               ? "bg-gray-400 cursor-not-allowed"
                               : "hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
@@ -261,29 +289,14 @@ const Page = () => {
                           disabled={pitchState.isConnected}
                         >
                           {pitchState.status === "pending"
-                            ? "Pending Approval"
+                            ? "Connect"
                             : pitchState.status === "accepted"
                             ? "Connected"
                             : "Declined"}
                         </Button>
                       </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          {pitchState.isExpanded
-                            ? pitch.projectIdea
-                            : `${pitch.projectIdea.slice(0, 100)}...`}
-                        </p>
-                        <Button
-                          variant="link"
-                          size="sm"
-                          className="p-0 mt-1 text-sm font-semibold text-blue-500 hover:underline"
-                          onClick={() => toggleReadMore(pitch._id)}
-                        >
-                          {pitchState.isExpanded ? "Read Less" : "Read More"}
-                        </Button>
-                      </div>
                     </div>
-                  </CardFooter>
+                  </div>
                 </Card>
               );
             })}

@@ -7,6 +7,7 @@ import Link from "next/link";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import Loader from "@/components/ui/Loader";
 
 export default function Signin() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function Signin() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false); // Added loading state
+  const [loading, setLoading] = useState(false); 
 
   const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
@@ -115,12 +116,15 @@ export default function Signin() {
           <Button
             type="submit"
             className="w-full mt-6 transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]"
-            disabled={loading} // Disable button when loading
+            disabled={loading}
           >
             {loading ? (
-              <div className="flex justify-center items-center">
-                <span className="loader"></span> {/* Loading animation */}
-              </div>
+              <>
+                <span className="sr-only">Loading...</span>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <Loader />
+                </span>
+              </>
             ) : (
               "Login"
             )}

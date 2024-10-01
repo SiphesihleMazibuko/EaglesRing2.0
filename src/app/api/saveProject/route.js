@@ -7,7 +7,7 @@ import { getServerSession } from 'next-auth';
 import authOptions from '@/lib/authOptions';
 import { Readable } from 'stream';
 
-// Helper function to convert a Blob into a stream
+
 function bufferToStream(buffer) {
   const readable = new Readable();
   readable.push(buffer);
@@ -15,46 +15,42 @@ function bufferToStream(buffer) {
   return readable;
 }
 
-// Helper function to upload file stream to Cloudinary
+
 async function uploadToCloudinary(file) {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       { folder: 'eagles_ring_projects', resource_type: 'auto' },
       (error, result) => {
-        if (error) return reject(error); // Log the error and reject the promise
-        resolve(result); // Resolve the promise with Cloudinary result
+        if (error) return reject(error);
+        resolve(result); 
       }
     );
-    file.pipe(uploadStream); // Pipe the file stream to Cloudinary
+    file.pipe(uploadStream); 
   });
 }
 
 export async function POST(req) {
   try {
-    // Parse form data
     const formData = await req.formData();
     const companyName = formData.get('companyName');
     const projectIdea = formData.get('projectIdea');
     const businessPhase = formData.get('businessPhase');
-    const imageFile = formData.get('image'); // The uploaded image
-    const videoFile = formData.get('video'); // The uploaded video
+    const investmentAmount = formData.get('investmentAmount')
+    const imageFile = formData.get('image'); 
+    const videoFile = formData.get('video'); 
 
-    // Connect to the database
     await connectToDatabase();
 
-    // Get the current session
     const session = await getServerSession({ req, ...authOptions });
     if (!session) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    // Find the user in the database
     const user = await User.findOne({ email: session.user.email });
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    // Initialize variables for Cloudinary URLs
     let projectImage = null;
     let pitchVideo = null;
 
@@ -90,6 +86,7 @@ export async function POST(req) {
       companyName,
       projectIdea,
       businessPhase,
+      investmentAmount,
       projectImage,  // Cloudinary image URL
       pitchVideo,    // Cloudinary video URL
     });

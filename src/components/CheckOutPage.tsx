@@ -1,4 +1,3 @@
-"use client";
 import React, { useEffect, useState } from "react";
 import {
   useStripe,
@@ -8,6 +7,41 @@ import {
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
+import Spinner from "./ui/Spinner";
+
+// Function to upload a file to Cloudinary with a signed request
+async function uploadToCloudinary(file: string | Blob, folder: string | Blob) {
+  // Fetch signature and timestamp from your API
+  const signatureResponse = await fetch("/api/cloudinary-signature");
+  const { signature, timestamp, cloudName } = await signatureResponse.json();
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("folder", folder);
+  const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing Cloudinary API key");
+  }
+
+  formData.append("api_key", apiKey);
+  formData.append("timestamp", timestamp);
+  formData.append("signature", signature);
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/dx0mmgase/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(`Cloudinary upload failed: ${data.error.message}`);
+  }
+
+  return data.secure_url;
+}
 
 const CheckOutPage = ({ amount }: { amount: number }) => {
   const stripe = useStripe();
@@ -18,13 +52,12 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("Fetching clientSecret for payment intent...");
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ amount: convertToSubcurrency(amount) }), // Pass the converted amount
+      body: JSON.stringify({ amount: convertToSubcurrency(amount) }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -75,48 +108,64 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
       return;
     }
 
-    // Now the payment is complete, we post the project data
     const projectData = sessionStorage.getItem("pendingProject");
 
     if (projectData) {
       try {
         const parsedProjectData = JSON.parse(projectData);
 
-        const formData = new FormData();
-        formData.append("companyName", parsedProjectData.companyName);
-        formData.append("projectIdea", parsedProjectData.projectIdea);
-        formData.append("businessPhase", parsedProjectData.businessPhase);
+        let imageUrl = null;
+        let videoUrl = null;
 
-        // Directly handle files from sessionStorage if saved correctly in the previous step
-        const imageBlob = sessionStorage.getItem("pendingImage");
-        const videoBlob = sessionStorage.getItem("pendingVideo");
+        // Handle Cloudinary uploads (client-side)
+        const imageFile = sessionStorage.getItem("pendingImage");
+        const videoFile = sessionStorage.getItem("pendingVideo");
 
-        if (imageBlob) {
-          const imageFile = new Blob([imageBlob]); // Convert to Blob
-          formData.append("image", imageFile);
+        if (imageFile) {          imageUrl = await uploadToCloudinary(
+            imageFile,
+            "eagles_ring_projects"
+          );
         }
 
-        if (videoBlob) {
-          const videoFile = new Blob([videoBlob]); // Convert to Blob
-          formData.append("video", videoFile);
+        if (videoFile) {
+          videoUrl = await uploadToCloudinary(
+            videoFile,
+            "eagles_ring_projects"
+          );
         }
 
         const response = await fetch("/api/saveProject", {
           method: "POST",
-          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            companyName: parsedProjectData.companyName,
+            projectIdea: parsedProjectData.projectIdea,
+            businessPhase: parsedProjectData.businessPhase,
+            investmentAmount: parsedProjectData.investmentAmount,
+            imageUrl, // Pass the Cloudinary image URL
+            videoUrl, // Pass the Cloudinary video URL
+          }),
         });
 
+        // Check for valid JSON response
+        const responseText = await response.text();
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Error response text:", errorText);
-          throw new Error(`Failed to post project: ${errorText}`);
+          throw new Error(`Failed to post project: ${responseText}`);
         }
 
-        toast.success("Project posted successfully!");
-        sessionStorage.removeItem("pendingProject");
-        sessionStorage.removeItem("pendingImage");
-        sessionStorage.removeItem("pendingVideo");
-        router.push("/project-success");
+        try {
+          const responseData = JSON.parse(responseText); // Parse JSON only if it's valid
+          toast.success("Project posted successfully!");
+          sessionStorage.removeItem("pendingProject");
+          sessionStorage.removeItem("pendingImage");
+          sessionStorage.removeItem("pendingVideo");
+          router.push("/project-success");
+        } catch (parseError) {
+          console.error("Error parsing response as JSON:", responseText);
+          throw new Error(`Unexpected response format: ${responseText}`);
+        }
       } catch (error) {
         console.error("Error while posting project to API:", error);
         toast.error("An error occurred while posting the project.");
@@ -131,11 +180,7 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
   if (!clientSecret) {
     return (
       <div className="flex items-center justify-center">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-none">
-          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-            Loading...
-          </span>
-        </div>
+        <Spinner />
       </div>
     );
   }
