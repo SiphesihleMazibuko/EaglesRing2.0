@@ -8,14 +8,14 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSession } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react"; // Import session functions
 import InvestorNavbar from "../investornavbar/page";
 import Navbar from "../navbar/page";
 import DashboardPage from "../dashboard/page";
+import Loader from "@/components/ui/Loader";
 
 interface Notification {
   _id: string;
@@ -30,13 +30,16 @@ interface Notification {
 }
 
 export function Profile() {
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (session?.user?.email) {
-      setEmail(session.user.email);
+    if (session?.user) {
+      setEmail(session.user.email || "");
+      setFullName(session.user.name || "");
     }
 
     const fetchNotifications = async () => {
@@ -92,6 +95,42 @@ export function Profile() {
     }
   };
 
+  const handleProfileUpdate = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/updateProfile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          fullName,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Profile updated successfully!");
+
+        // Update session with new email and full name
+        await updateSession({
+          user: {
+            ...session?.user,
+            email: email,
+            name: fullName,
+          },
+        });
+      } else {
+        toast.error("Failed to update profile.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("An error occurred while updating your profile.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="background-container min-h-screen flex-1">
       {session?.user?.userType === "Investor" ? <InvestorNavbar /> : <Navbar />}
@@ -105,32 +144,42 @@ export function Profile() {
             <div className="grid grid-cols-2 gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="fullName">Full Name</Label>
-                <span
+                <input
+                  type="text"
                   id="fullName"
-                  className="bg-neutral-50 p-2 rounded font-bold"
-                >
-                  {session?.user?.name || "No Name Available"}
-                </span>
+                  className="bg-transparent  border border-gray-300 p-3 rounded-lg font-bold text-black focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <span
+                <input
+                  type="email"
                   id="email"
-                  className="bg-neutral-50 p-2 rounded font-bold"
-                >
-                  {session?.user?.email}
-                </span>
+                  className="bg-transparent border border-gray-300 p-3 rounded-lg font-bold text-black focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="userType">Type</Label>
                 <span
                   id="userType"
-                  className="bg-neutral-50 p-2 rounded font-bold"
+                  className="bg-input border border-gray-300 p-3 rounded-lg font-bold text-black"
                 >
                   {session?.user?.userType || "N/A"}
                 </span>
               </div>
             </div>
+            <Button
+              variant="default"
+              className="ml-auto font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
+              onClick={handleProfileUpdate}
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader /> : "Update Profile"}
+            </Button>
           </CardContent>
           <CardFooter>
             <div className="w-full">

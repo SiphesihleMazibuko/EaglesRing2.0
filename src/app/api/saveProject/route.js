@@ -54,50 +54,51 @@ export async function POST(req) {
     let projectImage = null;
     let pitchVideo = null;
 
-    // Handle image upload
+ 
     if (imageFile) {
       try {
-        const imageBuffer = Buffer.from(await imageFile.arrayBuffer()); // Convert image to Buffer
-        const imageStream = bufferToStream(imageBuffer); // Convert buffer to stream
-        const imageUpload = await uploadToCloudinary(imageStream); // Upload to Cloudinary
-        projectImage = imageUpload.secure_url; // Get the Cloudinary image URL
+        const imageBuffer = Buffer.from(await imageFile.arrayBuffer()); 
+        const imageStream = bufferToStream(imageBuffer); 
+        const imageUpload = await uploadToCloudinary(imageStream); 
+        projectImage = imageUpload.secure_url; 
       } catch (error) {
         console.error('Error uploading image:', error);
         return NextResponse.json({ message: 'Image upload failed', error: error.message }, { status: 500 });
       }
     }
 
-    // Handle video upload
+
     if (videoFile) {
       try {
-        const videoBuffer = Buffer.from(await videoFile.arrayBuffer()); // Convert video to Buffer
-        const videoStream = bufferToStream(videoBuffer); // Convert buffer to stream
-        const videoUpload = await uploadToCloudinary(videoStream); // Upload to Cloudinary
-        pitchVideo = videoUpload.secure_url; // Get the Cloudinary video URL
+        const videoBuffer = Buffer.from(await videoFile.arrayBuffer()); 
+        const videoStream = bufferToStream(videoBuffer); 
+        const videoUpload = await uploadToCloudinary(videoStream); 
+        pitchVideo = videoUpload.secure_url; 
       } catch (error) {
         console.error('Error uploading video:', error);
         return NextResponse.json({ message: 'Video upload failed', error: error.message }, { status: 500 });
       }
     }
 
-    // Create a new pitch and save it to MongoDB
     const newPitch = new Pitch({
       entrepreneurId: user._id,
       companyName,
       projectIdea,
       businessPhase,
       investmentAmount,
-      projectImage,  // Cloudinary image URL
-      pitchVideo,    // Cloudinary video URL
+      projectImage,  
+      pitchVideo,   
     });
 
-    // Save the pitch to the database
     await newPitch.save();
 
     return NextResponse.json({ message: 'Project posted successfully!' }, { status: 200 });
   } catch (error) {
-    // Catch all errors and return a 500 response
-    console.error('Error saving project:', error);
+    console.error('Error saving project:', {
+      message: error.message,
+      stack: error.stack,
+      fullError: error
+    });
     return NextResponse.json({ message: 'Internal server error', error: error.message }, { status: 500 });
   }
 }

@@ -6,27 +6,26 @@ import User from '@/models/user';
 export async function middleware(req) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  const { pathname } = req.nextUrl;
-  const protectedRoutes = ['/services', '/chat', '/contact', '/aboutUs', '/profile'];
-
-  const baseURL = process.env.NEXTAUTH_URL;
-
-  if (!token && protectedRoutes.some(route => pathname.startsWith(route))) {
-    const url = new URL('/signin', baseURL);
+  if (!token) {
+    const url = new URL('/signin', req.url); // Adjusting to use req.url for proper redirect
     return NextResponse.redirect(url);
   }
 
-  if (token) {
+  try {
     await dbConnect();
     const user = await User.findOne({ email: token.email });
     if (user) {
-      req.userRole = user.userType;
+      const response = NextResponse.next();
+      response.headers.set('x-user-role', user.userType); // Setting user role in response header
+      return response;
     }
+  } catch (error) {
+    console.error('Database error:', error);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/services', '/chat', '/contact', '/aboutUs', '/profile'],
+  matcher: ['/services', '/chat', '/contact', '/aboutUs', '/profile'], // Route matcher
 };

@@ -132,6 +132,7 @@ function PostProject() {
       !formData.investmentAmount
     ) {
       toast.error("Please fill out all required fields.");
+      setLoading(false); // Stop loading when validation fails
       return;
     }
 
@@ -150,7 +151,21 @@ function PostProject() {
       });
 
       if (response.ok) {
+        const newProject = await response.json();
         toast.success("Pitch posted");
+
+        // Reset form fields after submission
+        setFormData({
+          companyName: "",
+          projectIdea: "",
+          image: null,
+          video: null,
+          businessPhase: "",
+          investmentAmount: "",
+        });
+
+        // Update the project list with the new project without refreshing
+        setUserProjects((prevProjects) => [...prevProjects, newProject]);
       } else {
         const errorMessage = await response.text();
         console.error("Response error:", errorMessage);
@@ -159,11 +174,28 @@ function PostProject() {
     } catch (error) {
       console.error("Submit error:", error);
       toast.error("An error occurred. Please try again.");
-      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchUserProjects = async () => {
+      try {
+        const response = await fetch("/api/getEntrepreneurProject");
+        if (response.ok) {
+          const data = await response.json();
+          setUserProjects(data);
+        } else {
+          toast.error("Error fetching projects");
+        }
+      } catch (error) {
+        toast.error("Error fetching projects");
+      }
+    };
+
+    fetchUserProjects();
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -292,19 +324,10 @@ function PostProject() {
 
             <Button
               type="submit"
-              className="ml-auto font-bold text-sm py-2 px-5 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
+              className="ml-auto font-bold text-sm py-2 px-7 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
               disabled={loading}
             >
-              {loading ? (
-                <>
-                  <span className="sr-only">Loading...</span>
-                  <span className="absolute inset-0 flex items-center justify-center">
-                    <Loader />
-                  </span>
-                </>
-              ) : (
-                "Post"
-              )}
+              {loading ? <Loader /> : "Post"}
             </Button>
           </form>
 
@@ -365,11 +388,13 @@ function PostProject() {
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">
-                            {project.projectIdea.length > 100
+                            {project.projectIdea?.length > 100
                               ? `${project.projectIdea.slice(0, 100)}...`
-                              : project.projectIdea}
+                              : project.projectIdea ||
+                                "No project idea provided"}
                           </p>
-                          {project.projectIdea.length > 100 && (
+
+                          {project.projectIdea?.length > 100 && (
                             <Button
                               variant="link"
                               size="sm"
