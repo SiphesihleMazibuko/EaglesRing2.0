@@ -146,8 +146,6 @@ function PostProject() {
     if (formData.video) projectData.append("video", formData.video);
 
     try {
-      console.log([...projectData.entries()]); // Debug: Check form data before sending
-
       const response = await fetch("/api/saveProject", {
         method: "POST",
         body: projectData,
@@ -170,7 +168,7 @@ function PostProject() {
         // Update the project list with the new project without refreshing
         setUserProjects((prevProjects) => [...prevProjects, newProject]);
       } else {
-        const errorMessage = await response.json().catch(() => response.text());
+        const errorMessage = await response.json();
         console.error("Response error:", errorMessage);
         toast.error("An error occurred. Please try again.");
       }
