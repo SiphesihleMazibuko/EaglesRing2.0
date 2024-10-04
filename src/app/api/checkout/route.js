@@ -1,4 +1,4 @@
-import { getServerSession } from 'next-auth'; 
+import { getServerSession } from 'next-auth';
 import Stripe from 'stripe';
 import nodemailer from 'nodemailer';
 import authOptions from '@/lib/authOptions';
@@ -7,11 +7,11 @@ import authOptions from '@/lib/authOptions';
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {
-    throw new Error("Stripe secret key is missing in environment variables");
+  throw new Error("Stripe secret key is missing in environment variables");
 }
 
 // Initialize Stripe
-const stripe = new Stripe(stripeSecretKey)
+const stripe = new Stripe(stripeSecretKey);
 
 // Named export for the POST request handler
 export async function POST(req) {
@@ -24,7 +24,7 @@ export async function POST(req) {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user?.email) {
-      throw new Error("Investor email not found in session.");
+      return new Response(JSON.stringify({ error: 'Investor email not found in session' }), { status: 401 });
     }
 
     const investorEmail = session.user.email;
@@ -54,10 +54,10 @@ export async function POST(req) {
     });
 
     // Send email notification
-    await sendEmailNotification(entrepreneurEmail, amount, investorEmail);
+    await sendEmailNotification(entrepreneurEmail, amount, investorEmail, companyName);
 
-    // Return the session ID as a response
-    return new Response(JSON.stringify({ id: stripeSession.id }), { status: 200 });
+    // Return the session URL as a response for redirecting
+    return new Response(JSON.stringify({ url: stripeSession.url }), { status: 200 });
   } catch (error) {
     console.error('Error during payment session creation:', error);
     return new Response(JSON.stringify({ error: 'Payment session creation failed' }), { status: 500 });
@@ -65,34 +65,29 @@ export async function POST(req) {
 }
 
 // Helper function to send email notifications
-async function sendEmailNotification(
-  entrepreneurEmail, 
-  amount, 
-  investorEmail
-) {
+async function sendEmailNotification(entrepreneurEmail, amount, investorEmail, companyName) {
+  console.log('Entrepreneur Email:', entrepreneurEmail);
 
-  console.log('Entrepreneur Email:',entrepreneurEmail);
-
-  if(!entrepreneurEmail){
-    throw new Error("No recipient email provided")
+  if (!entrepreneurEmail) {
+    throw new Error("No recipient email provided");
   }
- const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER, // Your email credentials
-    pass: process.env.EMAIL_PASSWORD, // Your email password
-  },
-  tls: {
-    rejectUnauthorized: false, // Accept self-signed certificates
-  },
-});
 
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER, // Your email credentials
+      pass: process.env.EMAIL_PASSWORD, // Your email password
+    },
+    tls: {
+      rejectUnauthorized: false, // Accept self-signed certificates
+    },
+  });
 
   const mailOptions = {
     from: process.env.EMAIL_USER, // Platform email (e.g., noreply@yourwebsite.com)
     to: entrepreneurEmail, // Entrepreneur's email (recipient)
     subject: 'Investment Received',
-    text: `You have received an investment of R${amount} from ${investorEmail}. Please log in to your dashboard for more details.`,
+    text: `You have received an investment of R${amount} from ${investorEmail} regarding your project "${companyName}" posted on Eagles Ring. Please log in to your dashboard for more details.`,
   };
 
   try {

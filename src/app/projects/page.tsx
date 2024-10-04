@@ -72,7 +72,8 @@ const Page = () => {
   const handleInvest = async (
     pitchId: string,
     amount: number,
-    entrepreneurEmail: string
+    entrepreneurEmail: string,
+    companyName: string
   ) => {
     try {
       setLoading(true);
@@ -85,19 +86,24 @@ const Page = () => {
           amount,
           entrepreneurEmail,
           pitchId,
+          companyName,
         }),
       });
 
       const data = await response.json();
-      if (data.id) {
-        // Redirect to Stripe Checkout
-        window.location.href = "https://buy.stripe.com/test_aEUdTjcXYbtz7CM5kk";
+
+      if (data.url) {
+        // Redirect to the Stripe Checkout URL returned by the API
+        window.location.href = data.url;
+      } else {
+        console.error("No session URL returned from Stripe");
       }
     } catch (error) {
       console.error("Error starting payment:", error);
       setLoading(false);
     }
   };
+
   return (
     <section className="background-container flex flex-col items-center">
       <div className="w-full bg-neutral-50">
@@ -273,9 +279,11 @@ const Page = () => {
                             handleInvest(
                               pitch._id,
                               parseInt(pitch.investmentAmount),
-                              pitch.entrepreneurEmail
+                              pitch.entrepreneurEmail,
+                              pitch.companyName
                             )
                           }
+                          disabled={loading}
                           variant="secondary"
                           size="sm"
                           className="font-bold text-sm py-2 px-5 mt-4 rounded-lg cursor-pointer hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"

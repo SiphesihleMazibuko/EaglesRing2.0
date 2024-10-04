@@ -188,7 +188,7 @@ function PostProject() {
           const data = await response.json();
           setUserProjects(data);
         } else {
-          toast.info("You have no pitches available");
+          toast.error("Error fetching projects");
         }
       } catch (error) {
         toast.error("Error fetching projects");
