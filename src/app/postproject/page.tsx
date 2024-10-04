@@ -23,6 +23,7 @@ interface Project {
   _id: string;
   companyName: string;
   projectIdea: string;
+  entrepreneurEmail: string;
   businessPhase: string;
   pitchVideo: string | null;
   projectImage: string | null;

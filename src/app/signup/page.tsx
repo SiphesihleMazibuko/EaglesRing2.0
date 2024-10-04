@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,72 +16,54 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/Loader";
+import { Label } from "@radix-ui/react-label";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle2, XCircle } from "lucide-react";
 
 export default function Component() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [mentorFullName, setmentorFullName] = useState("");
+  const [mentorEmail, setMentorEmail] = useState("");
   const [userType, setUserType] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [tax, setTax] = useState("");
-  const [company, setCompany] = useState("");
   const [idnum, setIdnum] = useState("");
   const [idType, setIdType] = useState("ID");
   const [errors, setErrors] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [passwordStrengthLabel, setPasswordStrengthLabel] = useState("");
-  const [avatarImage, setAvatarImage] = useState("/placeholder-user.jpg");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setAvatarImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handlePasswordStrength = (password: any) => {
+  const checkPasswordStrength = (pass: string) => {
     let strength = 0;
-
-    if (password.length > 0) strength++;
-    if (password.length >= 6) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[@$!%*?&]/.test(password)) strength++;
-
-    setPasswordStrength(strength);
-
-    switch (strength) {
-      case 1:
-        setPasswordStrengthLabel("Very Weak");
-        break;
-      case 2:
-        setPasswordStrengthLabel("Weak");
-        break;
-      case 3:
-        setPasswordStrengthLabel("Strong");
-        break;
-      case 4:
-      case 5:
-        setPasswordStrengthLabel("Very Strong");
-        break;
-      default:
-        setPasswordStrengthLabel("");
-    }
+    if (pass.length >= 8) strength += 25;
+    if (pass.match(/(?=.*[0-9].*[0-9])/)) strength += 25;
+    if (pass.match(/(?=.*[!@#$%^&*])/)) strength += 25;
+    if (pass.match(/(?=.*[a-z])(?=.*[A-Z])/)) strength += 25;
+    return strength;
   };
 
-  const handlePasswordChange = (e: { target: { value: any } }) => {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-    handlePasswordStrength(newPassword);
-  };
+  const passwordRequirements = [
+    {
+      label: "At least 8 characters long",
+      check: (pass: string) => pass.length >= 8,
+    },
+    {
+      label: "Contains at least 2 numbers",
+      check: (pass: string) => (pass.match(/\d/g) || []).length >= 2,
+    },
+    {
+      label: "Contains at least 1 special character",
+      check: (pass: string) => /[!@#$%^&*]/.test(pass),
+    },
+    {
+      label: "Contains uppercase and lowercase letters",
+      check: (pass: string) => /(?=.*[a-z])(?=.*[A-Z])/.test(pass),
+    },
+  ];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -93,42 +75,47 @@ export default function Component() {
       !password ||
       !confirmPassword ||
       !userType ||
-      !tax ||
-      !company ||
       !idnum
     ) {
       setErrors("All fields are required");
       toast.error("All fields are required");
+      setLoading(false);
       return;
     }
     if (!termsAccepted) {
       setErrors("You must agree to the terms and conditions");
       toast.error("You must agree to the terms and conditions");
+      setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setErrors("Passwords do not match");
       toast.error("Passwords do not match");
-      return;
-    }
-
-    if (tax.length !== 13) {
-      setErrors("Tax number must be 13 digits");
-      toast.error("Tax number must be 13 digits");
+      setLoading(false);
       return;
     }
 
     if (idType === "ID" && (idnum.length !== 13 || isNaN(Number(idnum)))) {
       setErrors("ID number must be 13 digits");
       toast.error("ID number must be 13 digits");
+      setLoading(false);
       return;
     }
 
     if (idType === "Passport" && !/^[a-zA-Z0-9]{5,10}$/.test(idnum)) {
       setErrors("Passport number must be 5 to 10 alphanumeric characters");
       toast.error("Passport number must be valid");
+      setLoading(false);
       return;
+    }
+    if (userType === "Investor") {
+      if (!mentorFullName || !mentorEmail) {
+        setErrors("Mentor Details Required");
+        toast.error("Mentor Details Required");
+        setLoading(false);
+        return;
+      }
     }
 
     try {
@@ -158,26 +145,34 @@ export default function Component() {
           email,
           userType,
           password,
-          avatarImage,
-          tax,
-          company,
           idnum,
           idType,
+          ...(userType === "Investor" && { mentorFullName, mentorEmail }),
         }),
       });
 
       if (res.ok) {
-        setAvatarImage("/placeholder-user.jpg");
         setFullName("");
         setEmail("");
         setUserType("");
         setPassword("");
         setConfirmPassword("");
-        setTax("");
-        setCompany("");
         setIdnum("");
+        setMentorEmail("");
+        setmentorFullName("");
         setTermsAccepted(false);
         toast.success("Registration successful");
+        console.log({
+          fullName,
+          email,
+          userType,
+          password,
+          idnum,
+          idType,
+          mentorFullName,
+          mentorEmail,
+        });
+
         router.push("/signin");
       } else {
         const data = await res.json();
@@ -191,6 +186,10 @@ export default function Component() {
     }
   };
 
+  useEffect(() => {
+    setPasswordStrength(checkPasswordStrength(password));
+  }, [password]);
+
   return (
     <div className="flex justify-center py-12 bg-background min-h-screen">
       <ToastContainer />
@@ -198,24 +197,6 @@ export default function Component() {
         <h1 className="text-3xl font-bold text-center text-card-foreground mb-6">
           Registration
         </h1>
-        <div className="flex flex-col items-center mb-4">
-          <Avatar>
-            <AvatarImage src={avatarImage} />
-            <AvatarFallback>A</AvatarFallback>
-          </Avatar>
-          <Button variant="secondary" className="mt-2 hover:underline">
-            <label htmlFor="avatar-upload" className="cursor-pointer">
-              Upload an image
-              <input
-                type="file"
-                id="avatar-upload"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageUpload}
-              />
-            </label>
-          </Button>
-        </div>
         <form onSubmit={handleSubmit} className="space-y-4 flex flex-col">
           <div className="relative">
             <UserIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -238,28 +219,6 @@ export default function Component() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div className="relative">
-            <MailIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              name="tax"
-              placeholder="Tax number"
-              type="text"
-              className="bg-card text-card-foreground pr-8"
-              value={tax}
-              onChange={(e) => setTax(e.target.value)}
-            />
-          </div>
-          <div className="relative">
-            <MailIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              name="company"
-              placeholder="Company Name"
-              type="text"
-              className="bg-card text-card-foreground pr-8"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-            />
-          </div>
 
           {/* ID or Passport Type Selector */}
           <Select value={idType} onValueChange={(value) => setIdType(value)}>
@@ -267,8 +226,15 @@ export default function Component() {
               <SelectValue placeholder="Select ID or Passport" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ID">ID Number</SelectItem>
-              <SelectItem value="Passport">Passport Number</SelectItem>
+              <SelectItem value="ID" className="bg-card text-card-foreground">
+                ID Number
+              </SelectItem>
+              <SelectItem
+                value="Passport"
+                className="bg-card text-card-foreground"
+              >
+                Passport Number
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -307,7 +273,37 @@ export default function Component() {
               </SelectItem>
             </SelectContent>
           </Select>
-
+          {userType === "Investor" && (
+            <>
+              <div className="space-y-2">
+                <div className="relative">
+                  <UserIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    id="mentorFullName"
+                    placeholder=" Mentor Full Name (Required)"
+                    className="pl-10"
+                    required
+                    value={mentorFullName}
+                    onChange={(e) => setmentorFullName(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="relative">
+                  <MailIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    id="mentorEmail"
+                    type="email"
+                    placeholder="Mentor Email (Required)"
+                    className="pl-10"
+                    value={mentorEmail}
+                    onChange={(e) => setMentorEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+            </>
+          )}
           {/* Password Input */}
           <div className="relative">
             <Input
@@ -316,39 +312,51 @@ export default function Component() {
               type={showPassword ? "text" : "password"}
               className="bg-card text-card-foreground pr-8"
               value={password}
-              onChange={handlePasswordChange}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground bg-transparent"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <EyeOffIcon /> : <EyeIcon />}
               <span className="sr-only">Toggle password visibility</span>
             </Button>
           </div>
+          <Progress value={passwordStrength} className="w-full" />
 
           {/* Password strength bar */}
-          <div className="relative h-2 w-full bg-gray-300 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                passwordStrength === 1
-                  ? "bg-warning w-1/4"
-                  : passwordStrength === 2
-                  ? "bg-yellow-400 w-1/2"
-                  : passwordStrength === 3
-                  ? "bg-info w-3/4"
-                  : passwordStrength >= 4
-                  ? "bg-success w-full"
-                  : "w-0"
-              }`}
-            />
+          <div className="space-y-1 mt-2">
+            {passwordRequirements.map((req, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                {req.check(password) ? (
+                  <CheckCircle2 className="h-4 w-4 text-accent" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-destructive" />
+                )}
+                <span
+                  className={`text-sm ${
+                    req.check(password) ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  {req.label}
+                </span>
+              </div>
+            ))}
           </div>
-          <p className="mt-2 text-center text-sm font-medium text-gray-600">
-            {passwordStrengthLabel}
-          </p>
+          {passwordStrength < 100 && (
+            <p className="text-sm text-destructive">
+              {passwordStrength === 0 && "Very Weak"}
+              {passwordStrength === 25 && "Weak"}
+              {passwordStrength === 50 && "Medium"}
+              {passwordStrength === 75 && "Strong"}
+            </p>
+          )}
+          {passwordStrength === 100 && (
+            <p className="text-sm text-accent">Very Strong</p>
+          )}
 
           {/* Confirm Password */}
           <div className="relative">

@@ -2,10 +2,6 @@ import mongoose, { Schema, models } from 'mongoose';
 
 const userSchema = new Schema(
   {
-    avatarImage: {
-      type: String,
-      required: true,
-    },
     fullName: {
       type: String,
       required: true,
@@ -18,6 +14,7 @@ const userSchema = new Schema(
     },
     userType: {
       type: String,
+      enum:["Entrepreneur","Investor"],
       required: true,
     },
     password: {
@@ -26,7 +23,7 @@ const userSchema = new Schema(
     },
     idType: {
       type: String,
-      enum: ['ID', 'Passport'], // Ensure that the type is either ID or Passport
+      enum: ['ID', 'Passport'], 
       required: true,
     },
     idnum: {
@@ -47,21 +44,23 @@ const userSchema = new Schema(
             : "Passport Number must be 5 to 10 alphanumeric characters.",
       },
     },
-    company: {
+    mentorFullName: {
       type: String,
-      required: true,
+      required: function () {
+        return this.userType === 'investor'; 
+      },
     },
-    tax: {
+    mentorEmail: {
       type: String,
-      required: true,
-      match: [/^\d{13}$/, "Tax Number must be exactly 13 numeric characters."],
-    },
-    file: {
-      type: String,
+      required: function () {
+        return this.userType === 'investor'; 
+      },
+      match: [/^\S+@\S+\.\S+$/, "Please use a valid email address."],
     },
   },
   { timestamps: true }
 );
+
 
 const User = models.User || mongoose.model('User', userSchema);
 

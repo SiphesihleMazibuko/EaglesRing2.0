@@ -1,26 +1,41 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import connectMongoDB from "@/lib/mongodb";
+import connectToDatabase from "@/lib/mongodb";
 import User from "@/models/user";
 
 export async function POST(req) {
   try {
-    const { fullName, email, userType, password, avatarImage, tax, company, idnum, idType } = await req.json();
+    const {
+      fullName,
+      email,
+      userType,
+      password,
+      idnum,
+      idType,
+      mentorFullName,
+      mentorEmail,
+    } = await req.json();
 
-    if (!fullName || !email || !userType || !password || !avatarImage || !tax || !company || !idnum || !idType) {
-      return NextResponse.json({ message: "All fields are required." }, { status: 400 });
+    if (!fullName || !email || !userType || !password || !idnum || !idType) {
+      return NextResponse.json({ message: "All required fields must be filled." }, { status: 400 });
     }
 
     // Validate ID number or passport number
     if (idType === "ID" && !/^\d{13}$/.test(idnum)) {
       return NextResponse.json({ message: "ID Number must be exactly 13 digits." }, { status: 400 });
     }
-
     if (idType === "Passport" && !/^[a-zA-Z0-9]{5,10}$/.test(idnum)) {
       return NextResponse.json({ message: "Passport Number must be 5 to 10 alphanumeric characters." }, { status: 400 });
     }
 
-    await connectMongoDB();
+    // Validate fields for investors
+    if (userType === "Investor") {
+      if (!mentorFullName || !mentorEmail) {
+        return NextResponse.json({ message: "Mentor information is required for investors." }, { status: 400 });
+      }
+    }
+
+    await connectToDatabase();
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -34,11 +49,10 @@ export async function POST(req) {
       email,
       userType,
       password: hashedPassword,
-      avatarImage,
-      tax,
-      company,
       idnum,
-      idType, 
+      idType,
+      mentorFullName,
+      mentorEmail,
     });
 
     return NextResponse.json({ message: "User Registered." }, { status: 201 });

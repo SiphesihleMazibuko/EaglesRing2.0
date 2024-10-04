@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import Spinner from "@/components/ui/Spinner";
 
 export default function PaymentSuccess({
   searchParams: { amount },
@@ -10,40 +11,43 @@ export default function PaymentSuccess({
 }) {
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
+  const [countdown, setCountdown] = useState(5); // Start with 5 seconds
 
   useEffect(() => {
     setRedirecting(true);
-    const timer = setTimeout(() => {
-      router.push("/postproject");
+
+    // Timer to update the countdown every second
+    const countdownTimer = setInterval(() => {
+      setCountdown((prevCountdown) => prevCountdown - 1);
+    }, 1000);
+
+    // Timer for redirecting after 5 seconds
+    const redirectTimer = setTimeout(() => {
+      router.push("/projects");
     }, 5000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(redirectTimer);
+      clearInterval(countdownTimer); // Clean up countdown interval
+    };
   }, [router]);
 
   return (
     <main className="max-w-6xl mx-auto p-10 text-input text-center border m-10 rounded-md bg-gradient-to-tr from-[#917953] to-[#CBAC7C]">
       <div className="mb-10">
         <h1 className="text-4xl font-extrabold mb-2">
-          Thank you! Your project has been posted
+          Thank you! Your Investment is highly appreciated
         </h1>
-        <h2 className="text-2xl">You successfully paid</h2>
-        <div className="bg-input p-2 rounded-md text-neutral-950 mt-5 text-4xl font-bold">
-          R{amount}
-        </div>
-        <Button type="submit" onClick={() => router.push("/postproject")}>
-          Redirect
-        </Button>
-
-        {/* Show redirecting message and animation */}
+        {/* Show redirecting message and countdown */}
         {redirecting && (
           <div className="mt-5 flex flex-col items-center">
-            <p className="text-lg font-medium">Redirecting in 5 seconds...</p>
+            <p className="text-lg font-medium">
+              Redirecting in {countdown} seconds...
+            </p>
             <div className="mt-3">
-              <div
-                className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-none"
-                role="status"
-              >
-                <span className="sr-only">Loading...</span>
+              {/* Spinner for extra feedback */}
+              <div className="mt-3">
+                <Spinner />
               </div>
             </div>
           </div>

@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from "react";
 import InvestorNavbar from "../investornavbar/page";
 import Footer from "../footer/page";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ToastContainer, toast } from "react-toastify";
 import {
   Select,
   SelectTrigger,
@@ -12,42 +11,36 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import "react-toastify/dist/ReactToastify.css";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
+import Loader from "@/components/ui/Loader";
 
 interface Pitch {
   projectImage: string;
   _id: string;
   entrepreneurId: string;
+  entrepreneurEmail: string;
   companyName: string;
   projectIdea: string;
   pitchVideo: string;
   investmentAmount: string;
   businessPhase: string;
   createdAt: string;
-  status: string; // Add the connection status from backend
-}
-
-interface PitchState {
-  isExpanded: boolean;
-  isConnected: boolean;
-  status: string; // Track the status (pending, accepted, declined)
 }
 
 const Page = () => {
   const { data: session } = useSession();
   const [pitches, setPitches] = useState<Pitch[]>([]);
-  const [pitchStates, setPitchStates] = useState<{ [key: string]: PitchState }>(
-    {}
-  );
   const [selectedPhase, setSelectedPhase] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<string>("newest");
-
+  const [expandedPitchStates, setExpandedPitchStates] = useState<{
+    [key: string]: boolean;
+  }>({}); // Track expanded states for each pitch
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchPitches = async () => {
-      const investorId = session?.user?.id;
       try {
-        const response = await fetch(`/api/getProject`);
+        const response = await fetch("/api/getProject");
         const data = await response.json();
         setPitches(data);
       } catch (error) {
@@ -59,46 +52,10 @@ const Page = () => {
   }, [session?.user?.id]);
 
   const toggleReadMore = (id: string) => {
-    setPitchStates((prevStates) => ({
+    setExpandedPitchStates((prevStates) => ({
       ...prevStates,
-      [id]: {
-        ...prevStates[id],
-        isExpanded: !prevStates[id]?.isExpanded,
-      },
+      [id]: !prevStates[id], // Toggle the specific pitch state
     }));
-  };
-
-  const handleConnect = async (pitch: Pitch) => {
-    try {
-      const response = await fetch("/api/connectInvestor", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          investorId: session?.user?.id,
-          entrepreneurId: pitch.entrepreneurId,
-          pitchId: pitch._id,
-        }),
-      });
-
-      if (response.ok) {
-        toast.info("Connection request sent! Waiting for approval.");
-        setPitchStates((prevStates) => ({
-          ...prevStates,
-          [pitch._id]: {
-            ...prevStates[pitch._id],
-            isConnected: true,
-            status: "pending",
-          },
-        }));
-      } else {
-        toast.error("Failed to send connection request.");
-      }
-    } catch (error) {
-      console.error("Error sending connection request:", error);
-      toast.error("An error occurred. Please try again.");
-    }
   };
 
   const filteredPitches = pitches
@@ -112,8 +69,37 @@ const Page = () => {
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
 
+  const handleInvest = async (
+    pitchId: string,
+    amount: number,
+    entrepreneurEmail: string
+  ) => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount,
+          entrepreneurEmail,
+          pitchId,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.id) {
+        // Redirect to Stripe Checkout
+        window.location.href = "https://buy.stripe.com/test_aEUdTjcXYbtz7CM5kk";
+      }
+    } catch (error) {
+      console.error("Error starting payment:", error);
+      setLoading(false);
+    }
+  };
   return (
-    <section className="background-container flex flex-col items-center ">
+    <section className="background-container flex flex-col items-center">
       <div className="w-full bg-neutral-50">
         <InvestorNavbar />
       </div>
@@ -208,12 +194,6 @@ const Page = () => {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 mt-10">
             {filteredPitches.map((pitch) => {
-              const pitchState = pitchStates[pitch._id] || {
-                isExpanded: false,
-                isConnected: pitch.status !== "pending", // Use status to check if connected
-                status: pitch.status || "pending", // Use status from the backend
-              };
-
               const createdAtDate = new Date(
                 pitch.createdAt
               ).toLocaleDateString("en-UK", {
@@ -222,46 +202,57 @@ const Page = () => {
                 day: "2-digit",
               });
 
-              return (
-                <Card key={pitch._id} className="border-0 shadow-sm">
-                  <div
-                    tabIndex={0}
-                    className={`collapse collapse-arrow bg-input border ${
-                      pitchState.isExpanded ? "collapse-open" : ""
-                    }`}
-                    onClick={() => toggleReadMore(pitch._id)} // Toggle specific pitch collapse
-                  >
-                    <div className="collapse-title p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {/* Display pitch image as an icon */}
-                          <img
-                            src={pitch.projectImage}
-                            alt={`${pitch.companyName} logo`}
-                            className="w-12 h-12 object-cover rounded-badge"
-                          />
-                          <div>
-                            {/* Company name, business phase, and created date */}
-                            <h4 className="text-sm font-medium">
-                              {pitch.companyName}
-                            </h4>
-                            <p className="text-xs text-muted-foreground">
-                              {pitch.businessPhase}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Created on: {createdAtDate}
-                            </p>
+              const isExpanded = expandedPitchStates[pitch._id] || false; // Check if the pitch is expanded
 
-                            {/* Display the investment amount */}
-                            <p className="text-sm text-neutral-950">
-                              Amount requested for: R{pitch.investmentAmount}
-                            </p>
-                          </div>
+              return (
+                <Card
+                  key={pitch._id}
+                  className="border-gray-950 bg-input shadow-sm"
+                >
+                  <div
+                    className="p-4 cursor-pointer"
+                    onClick={() => toggleReadMore(pitch._id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {/* Display pitch image as an icon */}
+                        <Image
+                          src={pitch.projectImage}
+                          alt={`${pitch.companyName} logo`}
+                          width={48}
+                          height={48}
+                          className="w-12 h-12 object-cover rounded-badge"
+                        />
+                        <div>
+                          {/* Company name, business phase, and created date */}
+                          <h4 className="text-sm font-medium">
+                            {pitch.companyName}
+                          </h4>
+                          <p className="text-xs text-muted-foreground">
+                            {pitch.businessPhase}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Created on: {createdAtDate}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {pitch.entrepreneurEmail}
+                          </p>
+
+                          {/* Display the investment amount */}
+                          <p className="text-sm font-semibold text-neutral-950">
+                            Amount requested for: R{pitch.investmentAmount}
+                          </p>
                         </div>
                       </div>
+                      <Button className="text-sm font-semibold text-blue-950 btn btn-outline">
+                        {isExpanded ? "Read Less" : "Read More"}
+                      </Button>
                     </div>
-                    {/* Hidden content: video and project idea */}
-                    <div className="collapse-content p-4">
+                  </div>
+
+                  {/* Hidden content: video and project idea */}
+                  {isExpanded && (
+                    <div className="p-4">
                       <div className="flex flex-col gap-2">
                         <video
                           controls
@@ -278,25 +269,22 @@ const Page = () => {
                         </p>
 
                         <Button
+                          onClick={() =>
+                            handleInvest(
+                              pitch._id,
+                              parseInt(pitch.investmentAmount),
+                              pitch.entrepreneurEmail
+                            )
+                          }
                           variant="secondary"
                           size="sm"
-                          className={`font-bold text-sm py-2 px-5 mt-4 rounded-lg cursor-pointer transition-transform duration-300 ease-in-out ${
-                            pitchState.isConnected
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
-                          }`}
-                          onClick={() => handleConnect(pitch)} // Pass the whole pitch object
-                          disabled={pitchState.isConnected}
+                          className="font-bold text-sm py-2 px-5 mt-4 rounded-lg cursor-pointer hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
                         >
-                          {pitchState.status === "pending"
-                            ? "Connect"
-                            : pitchState.status === "accepted"
-                            ? "Connected"
-                            : "Declined"}
+                          {loading ? <Loader /> : "Invest"}
                         </Button>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </Card>
               );
             })}
@@ -304,7 +292,6 @@ const Page = () => {
         )}
       </div>
       <Footer />
-      <ToastContainer />
     </section>
   );
 };

@@ -46,11 +46,13 @@ export async function POST(req) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
+    console.log("Session User Email: ",session?.user?.email)
+
     const user = await User.findOne({ email: session.user.email });
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
-
+      
     let projectImage = null;
     let pitchVideo = null;
 
@@ -82,6 +84,7 @@ export async function POST(req) {
 
     const newPitch = new Pitch({
       entrepreneurId: user._id,
+      entrepreneurEmail: session.user.email,
       companyName,
       projectIdea,
       businessPhase,
@@ -91,6 +94,7 @@ export async function POST(req) {
     });
 
     await newPitch.save();
+    console.log("Pitch saved successfully:", newPitch)
 
     return NextResponse.json({ message: 'Project posted successfully!' }, { status: 200 });
   } catch (error) {

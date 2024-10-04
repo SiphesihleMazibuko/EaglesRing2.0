@@ -1,10 +1,15 @@
 import mongoose, { Schema, models } from 'mongoose';
+import { type } from 'os';
 
 const pitchSchema = new Schema(
   {
     entrepreneurId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
+    },
+   entrepreneurEmail: {
+      type: String,  // This should be a String
       required: true,
     },
     companyName: {

@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Eagle from "@/assets/EaglesRingLogo.png";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const Onboarding = () => {
   const router = useRouter();
@@ -50,12 +52,12 @@ const Onboarding = () => {
                   </p>
                 </div>
                 <div className="space-x-4 py-4">
-                  <button
+                  <Button
                     className="inline-flex h-9 items-center justify-center transform hover:scale-105 text-black bg-gradient-to-r from-[#917953] to-[#CBAC7C] font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:border-[#917953] border-[#917953]"
                     onClick={handleSignup}
                   >
                     Get Started
-                  </button>
+                  </Button>
                 </div>
               </div>
               <div className="flex flex-col items-center justify-center">
