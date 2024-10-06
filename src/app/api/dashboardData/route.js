@@ -25,7 +25,6 @@ export async function GET(req) {
 
     const entrepreneurId = user._id;
 
-    // Fetch the number of pitches for the entrepreneur
     const numberOfPitches = await Pitch.countDocuments({ entrepreneurId });
 
     // Return the data

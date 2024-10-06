@@ -97,6 +97,7 @@ const Page = () => {
         window.location.href = data.url;
       } else {
         console.error("No session URL returned from Stripe");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error starting payment:", error);

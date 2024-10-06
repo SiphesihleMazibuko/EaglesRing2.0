@@ -12,9 +12,34 @@ const userSchema = new Schema(
       unique: true,
       match: [/^\S+@\S+\.\S+$/, "Please use a valid email address."],
     },
+    plan: {
+      type: String,
+      enum: ['basic', 'premium'],
+      default: 'basic',
+    },
+     stripeCustomerId: { type: String },
+    subscriptionID: {
+      type: String, 
+    },
+    subscriptionStatus: {
+      type: String, 
+      enum: ['active', 'canceled', 'past_due', 'unpaid', 'inactive'],
+      default: 'inactive',
+    },
+    charges: [
+      {
+        type: String, 
+      },
+    ],
+    lastInvoicePaid: {
+      type: String, 
+    },
+    lastPaymentIntent: {
+      type: String, 
+    },
     userType: {
       type: String,
-      enum:["Entrepreneur","Investor"],
+      enum: ["Entrepreneur", "Investor"],
       required: true,
     },
     password: {
@@ -23,7 +48,7 @@ const userSchema = new Schema(
     },
     idType: {
       type: String,
-      enum: ['ID', 'Passport'], 
+      enum: ['ID', 'Passport'],
       required: true,
     },
     idnum: {
@@ -32,9 +57,9 @@ const userSchema = new Schema(
       validate: {
         validator: function (value) {
           if (this.idType === 'ID') {
-            return /^\d{13}$/.test(value); // ID number must be 13 digits
+            return /^\d{13}$/.test(value); 
           } else if (this.idType === 'Passport') {
-            return /^[a-zA-Z0-9]{5,10}$/.test(value); // Passport number must be 5-10 alphanumeric characters
+            return /^[a-zA-Z0-9]{5,10}$/.test(value); 
           }
           return false;
         },
@@ -47,20 +72,19 @@ const userSchema = new Schema(
     mentorFullName: {
       type: String,
       required: function () {
-        return this.userType === 'investor'; 
+        return this.userType === 'Investor'; 
       },
     },
     mentorEmail: {
       type: String,
       required: function () {
-        return this.userType === 'investor'; 
+        return this.userType === 'Investor'; 
       },
       match: [/^\S+@\S+\.\S+$/, "Please use a valid email address."],
     },
   },
   { timestamps: true }
 );
-
 
 const User = models.User || mongoose.model('User', userSchema);
 

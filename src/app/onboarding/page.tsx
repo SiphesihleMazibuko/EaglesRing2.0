@@ -10,7 +10,7 @@ const Onboarding = () => {
   const router = useRouter();
 
   const handleSignup = () => {
-    router.push("/signup");
+    router.push("/signin");
   };
   return (
     <div className="flex flex-col min-h-[100dvh] background-container">
