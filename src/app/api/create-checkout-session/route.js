@@ -25,8 +25,8 @@ export async function POST(req) {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXTAUTH_URL}success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXTAUTH_URL}pricing`,
+      success_url: `${process.env.NEXTAUTH_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXTAUTH_URL}/pricing`,
     });
 
    await connectToDatabase();

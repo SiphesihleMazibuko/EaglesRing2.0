@@ -59,7 +59,7 @@ export async function GET(req) {
   }
 
   try {
-    // Connect to the MongoDB database
+
  await connectToDatabase();
     const user = await User.findOne({ email });
 
@@ -71,7 +71,6 @@ export async function GET(req) {
       );
     }
 
-    // Fetch subscription details from Stripe
     const subscription = await stripe.subscriptions.retrieve(
       user.subscriptionID
     );
