@@ -133,7 +133,7 @@ function PostProject() {
       !formData.investmentAmount
     ) {
       toast.error("Please fill out all required fields.");
-      setLoading(false); // Stop loading when validation fails
+      setLoading(false);
       return;
     }
 
@@ -155,7 +155,6 @@ function PostProject() {
         const newProject = await response.json();
         toast.success("Pitch posted");
 
-        // Reset form fields after submission
         setFormData({
           companyName: "",
           projectIdea: "",
@@ -165,7 +164,6 @@ function PostProject() {
           investmentAmount: "",
         });
 
-        // Update the project list with the new project without refreshing
         setUserProjects((prevProjects) => [...prevProjects, newProject]);
       } else {
         const errorMessage = await response.json();
@@ -247,7 +245,7 @@ function PostProject() {
                   id="image"
                   name="image"
                   accept="image/*"
-                  onChange={handleChange} // handleChange will capture the image file
+                  onChange={handleChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -262,7 +260,7 @@ function PostProject() {
                   id="video"
                   name="video"
                   accept="video/*"
-                  onChange={handleChange} // handleChange will capture the video file
+                  onChange={handleChange}
                 />
               </div>
             </div>

@@ -16,10 +16,8 @@ export async function POST(req) {
       );
     }
 
-    // Fetch subscription from Stripe
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-    // Return subscription status
     return NextResponse.json({
       subscriptionStatus: subscription.status,
     });

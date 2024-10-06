@@ -18,11 +18,11 @@ export async function GET(req) {
 
   console.log("Session details:", session);
 
-  // Connect to the database
+
   await dbConnect();
   console.log("Connected to MongoDB");
 
-  // Find the user by email
+
   const user = await User.findOne({ email: session.user.email });
 
   if (!user) {
@@ -35,7 +35,6 @@ export async function GET(req) {
   const baseURL = process.env.NEXTAUTH_URL;
   console.log("Base URL:", baseURL);
 
-  // Check userType and handle accordingly
   if (user.userType === 'Investor') {
     console.log("User is an Investor. Redirecting to projects page.");
     return NextResponse.redirect(`${baseURL}/projects`);
@@ -46,11 +45,10 @@ export async function GET(req) {
       console.log("User has subscriptionID:", user.subscriptionID);
 
       try {
-        // Fetch the subscription details from Stripe
+
         const subscription = await stripe.subscriptions.retrieve(user.subscriptionID);
         console.log("Stripe subscription fetched:", subscription);
 
-        // If the subscription is active, redirect to services
         if (subscription.status === 'active' || subscription.status === 'paid') {
           console.log("Subscription is active/paid. Redirecting to services page.");
           return NextResponse.redirect(`${baseURL}/services`);

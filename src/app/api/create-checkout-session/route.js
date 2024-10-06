@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
-import  connectToDatabase from "@/lib/mongodb"; // Assuming you're using MongoDB
+import  connectToDatabase from "@/lib/mongodb"; 
 import User from "@/models/user";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -42,7 +42,7 @@ export async function POST(req) {
     );
     console.log('User updated:', user)
 
-    // Return the session ID to the frontend
+
     return NextResponse.json({ sessionId: session.id });
   } catch (err) {
     console.error("Stripe Checkout Error: ", err);

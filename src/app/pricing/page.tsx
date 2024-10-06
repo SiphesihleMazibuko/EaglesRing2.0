@@ -7,7 +7,6 @@ import Loader from "@/components/ui/Loader";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { useSession } from "next-auth/react";
 
-// Load the Stripe client using the publishable key from the environment variables
 if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
   throw new Error("NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined");
 }
@@ -21,7 +20,6 @@ const Pricing: React.FC = () => {
   const userEmail = session?.user?.email;
   const payId = "price_1Q6fbf09wN7R5HTy2MhXhG9c";
 
-  // Handle selecting a plan (basic or premium) and redirect accordingly
   const handleServices = async (plan: string, priceId?: string) => {
     setLoading(true);
     if (plan === "basic") {
@@ -44,7 +42,7 @@ const Pricing: React.FC = () => {
             plan: "premium",
             priceId: payId,
             email: userEmail,
-          }), // Pass the plan and priceId
+          }),
         });
 
         const { sessionId, error } = await response.json();
@@ -53,7 +51,6 @@ const Pricing: React.FC = () => {
           throw new Error(error);
         }
 
-        // Redirect to Stripe checkout page using the sessionId
         const result = await stripe?.redirectToCheckout({ sessionId });
 
         if (result?.error) {
@@ -134,7 +131,6 @@ const Pricing: React.FC = () => {
   );
 };
 
-// CheckIcon and XIcon components
 const CheckIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
     {...props}

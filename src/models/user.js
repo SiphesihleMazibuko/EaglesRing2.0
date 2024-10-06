@@ -1,4 +1,5 @@
 import mongoose, { Schema, models } from 'mongoose';
+import { type } from 'os';
 
 const userSchema = new Schema(
   {
@@ -51,6 +52,11 @@ const userSchema = new Schema(
       enum: ['ID', 'Passport'],
       required: true,
     },
+    investments:[{
+      pitchId: {type: mongoose.Schema.Types.ObjectId, ref: 'Pitch'},
+      investedAmount: Number,
+      investmentDate: Date,
+    }],
     idnum: {
       type: String,
       required: true,

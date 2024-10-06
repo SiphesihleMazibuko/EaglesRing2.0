@@ -7,7 +7,7 @@ export async function middleware(req) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   if (!token) {
-    const url = new URL('/signin', req.url); // Adjusting to use req.url for proper redirect
+    const url = new URL('/signin', req.url); 
     return NextResponse.redirect(url);
   }
 
@@ -16,7 +16,7 @@ export async function middleware(req) {
     const user = await User.findOne({ email: token.email });
     if (user) {
       const response = NextResponse.next();
-      response.headers.set('x-user-role', user.userType); // Setting user role in response header
+      response.headers.set('x-user-role', user.userType); 
       return response;
     }
   } catch (error) {
@@ -27,5 +27,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ['/services', '/chat', '/contact', '/aboutUs', '/profile'], // Route matcher
+  matcher: ['/services', '/chat', '/contact', '/aboutUs', '/profile'], 
 };

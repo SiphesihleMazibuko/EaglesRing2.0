@@ -19,13 +19,12 @@ export default function PaymentPage() {
   const amount = 149.99;
 
   useEffect(() => {
-    // Fetch the client secret for the PaymentIntent from your API
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ amount: amount * 100 }), // Convert to smallest currency unit (cents)
+      body: JSON.stringify({ amount: amount * 100 }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -42,10 +41,9 @@ export default function PaymentPage() {
     return <p>Loading...</p>;
   }
 
-  const username = session?.user?.name || "Guest"; // Fallback to "Guest" if no name is available
-
+  const username = session?.user?.name || "Guest";
   return (
-    <main className="max-w-6xl mx-auto p-10 text-input text-center border m-10 rounded-md bg-gradient-to-tr from-[#917953] to-[#CBAC7C]">
+    <div className="min-h-[100dvh] max-w-6xl mx-auto p-10 text-input background-container text-center border m-10 rounded-md bg-gradient-to-tr from-[#917953] to-[#CBAC7C]">
       <div className="mb-10">
         <h1 className="text-4xl font-extrabold mb-2">{username}</h1>
         <h2 className="text-2xl">
@@ -58,14 +56,14 @@ export default function PaymentPage() {
           options={{
             mode: "payment",
             amount: convertToSubcurrency(amount),
-            currency: "zar", // Pass clientSecret to Elements for processing payments
+            currency: "zar",
           }}
         >
           <CheckOutPage amount={amount} />
         </Elements>
       ) : (
-        <Spinner /> // Loading state while clientSecret is being fetched
+        <Spinner />
       )}
-    </main>
+    </div>
   );
 }

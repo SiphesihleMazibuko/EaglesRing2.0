@@ -7,7 +7,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    // Parse request body
     const { email } = await req.json();
     
     if (!email) {
@@ -15,10 +14,9 @@ export async function POST(req) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    // Ensure the database is connected
     await connectToDatabase();
 
-    // Find the user by email
+
     const user = await User.findOne({ email });
     
     if (!user) {
@@ -31,7 +29,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
     }
 
-    // Cancel the subscription in Stripe
+
     try {
       await stripe.subscriptions.cancel(user.subscriptionID);
     } catch (stripeError) {
@@ -39,7 +37,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "Failed to cancel subscription" }, { status: 500 });
     }
 
-    // Update the user’s record in the database
+
     user.plan = "basic";
     user.subscriptionID = null;
     user.subscriptionStatus = null;

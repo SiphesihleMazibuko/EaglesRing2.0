@@ -33,7 +33,7 @@ const ContactPage = () => {
 
       const result = await response.json();
       if (response.ok) {
-        toast.success("Message sent successfully!"); // Success toast notification
+        toast.success("Message sent successfully!");
         setFormData({
           firstName: "",
           lastName: "",
@@ -42,7 +42,7 @@ const ContactPage = () => {
         });
       } else {
         toast.error("Failed to send message");
-        console.error(result.message); // Error toast notification
+        console.error(result.message);
       }
     } catch (error) {
       toast.error("Failed to send message. Please try again later.");

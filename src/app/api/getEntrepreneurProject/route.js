@@ -3,17 +3,14 @@ import authOptions from "@/lib/authOptions";
 import dbConnect from "@/lib/mongodb";
 import Pitch from "@/models/pitch";
 import { NextResponse } from "next/server";
-import User from "@/models/user"; // Assuming you have a User model
+import User from "@/models/user"; 
 
-// Force dynamic behavior
 export const dynamic = 'force-dynamic';
 
-// Named export for the GET method
 export async function GET(req) {
   try {
     console.log("GET request received");
 
-    // Use getServerSession to get the session
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -23,7 +20,6 @@ export async function GET(req) {
 
     await dbConnect();
 
-    // Fetch the user from the database by email to get their entrepreneurId
     const user = await User.findOne({ email: session.user.email });
 
     if (!user) {
@@ -34,7 +30,6 @@ export async function GET(req) {
     const entrepreneurId = user._id;
 
     console.log("Fetching projects for entrepreneurId:", entrepreneurId);
-    // Fetch pitches using entrepreneurId
     const userPitches = await Pitch.find({ entrepreneurId });
 
     console.log("User projects fetched:", userPitches);

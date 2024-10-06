@@ -15,7 +15,7 @@ export default function Signin() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
@@ -25,11 +25,11 @@ export default function Signin() {
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    setLoading(true); // Set loading state to true on submit
+    setLoading(true);
 
     if (!email || !password) {
       toast.error("Please fill in all fields");
-      setLoading(false); // Reset loading if fields are missing
+      setLoading(false);
       return;
     }
 
@@ -42,7 +42,7 @@ export default function Signin() {
 
       if (!res) {
         toast.error("An error occurred during login");
-        setLoading(false); // Reset loading on error
+        setLoading(false);
         return;
       }
 
@@ -52,16 +52,16 @@ export default function Signin() {
           password: "Email or Password Incorrect",
         });
         toast.error("Email or Password Incorrect");
-        setLoading(false); // Reset loading on incorrect credentials
+        setLoading(false);
       } else {
         toast.success("Login successful");
         router.push("/api/auth/callback");
       }
     } catch (error) {
       toast.error("An error occurred during login");
-      setLoading(false); // Reset loading on exception
+      setLoading(false);
     } finally {
-      setLoading(false); // Ensure loading is reset at the end of the process
+      setLoading(false);
     }
   };
 

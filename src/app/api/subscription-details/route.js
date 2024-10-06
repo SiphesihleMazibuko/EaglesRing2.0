@@ -4,7 +4,6 @@ import User from "@/models/user";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// GET or POST handler for subscription details
 export async function POST(req) {
   try {
     const { email } = await req.json();
@@ -16,7 +15,6 @@ export async function POST(req) {
       );
     }
 
-    // Connect to the MongoDB database
     await connectToDatabase();
     const user = await User.findOne({ email });
 
@@ -27,7 +25,6 @@ export async function POST(req) {
       );
     }
 
-    // Fetch subscription details from Stripe
     const subscription = await stripe.subscriptions.retrieve(
       user.subscriptionID
     );

@@ -11,29 +11,27 @@ export default function PaymentSuccess({
 }) {
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
-  const [countdown, setCountdown] = useState(5); // Start with 5 seconds
+  const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
     setRedirecting(true);
 
-    // Timer to update the countdown every second
     const countdownTimer = setInterval(() => {
       setCountdown((prevCountdown) => prevCountdown - 1);
     }, 1000);
 
-    // Timer for redirecting after 5 seconds
     const redirectTimer = setTimeout(() => {
       router.push("/projects");
     }, 5000);
 
     return () => {
       clearTimeout(redirectTimer);
-      clearInterval(countdownTimer); // Clean up countdown interval
+      clearInterval(countdownTimer);
     };
   }, [router]);
 
   return (
-    <main className="max-w-6xl mx-auto p-10 text-input text-center border m-10 rounded-md bg-gradient-to-tr from-[#917953] to-[#CBAC7C]">
+    <div className=" min-h-[100dvh] background-container max-w-6xl mx-auto p-10 text-input text-center border m-10 rounded-md bg-gradient-to-tr from-[#917953] to-[#CBAC7C]">
       <div className="mb-10">
         <h1 className="text-4xl font-extrabold mb-2">
           Thank you! Your Investment is highly appreciated
@@ -53,6 +51,6 @@ export default function PaymentSuccess({
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

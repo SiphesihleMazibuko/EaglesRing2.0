@@ -9,7 +9,7 @@ const pitchSchema = new Schema(
       required: true,
     },
    entrepreneurEmail: {
-      type: String,  // This should be a String
+      type: String,  
       required: true,
     },
     companyName: {
@@ -45,6 +45,15 @@ const pitchSchema = new Schema(
     businessPhase: {
       type: String,
     },
+    isInvested: {
+      type: Boolean,
+      default: false,
+    },
+    investorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    }
   },
   { timestamps: true }
 );

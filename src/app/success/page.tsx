@@ -8,23 +8,21 @@ import React, { useEffect, useState } from "react";
 const Success = () => {
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
-  const [countdown, setCountdown] = useState(5); // Start with 5 seconds
+  const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
     setRedirecting(true);
 
-    // Timer to update the countdown every second
     const countdownTimer = setInterval(() => {
       setCountdown((prevCountdown) => prevCountdown - 1);
     }, 1000);
 
-    // Timer for redirecting after 5 seconds
     const redirectTimer = setTimeout(() => {
       router.push("/services");
     }, 5000);
     return () => {
       clearTimeout(redirectTimer);
-      clearInterval(countdownTimer); // Clean up countdown interval
+      clearInterval(countdownTimer);
     };
   }, [router]);
   return (

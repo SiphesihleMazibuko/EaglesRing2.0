@@ -20,7 +20,6 @@ export async function POST(req) {
       return NextResponse.json({ message: "All required fields must be filled." }, { status: 400 });
     }
 
-    // Validate ID number or passport number
     if (idType === "ID" && !/^\d{13}$/.test(idnum)) {
       return NextResponse.json({ message: "ID Number must be exactly 13 digits." }, { status: 400 });
     }
@@ -28,7 +27,7 @@ export async function POST(req) {
       return NextResponse.json({ message: "Passport Number must be 5 to 10 alphanumeric characters." }, { status: 400 });
     }
 
-    // Validate fields for investors
+
     if (userType === "Investor") {
       if (!mentorFullName || !mentorEmail) {
         return NextResponse.json({ message: "Mentor information is required for investors." }, { status: 400 });

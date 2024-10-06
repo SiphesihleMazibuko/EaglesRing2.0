@@ -11,10 +11,8 @@ const InvestorDashboard: React.FC = () => {
   const [customerId, setCustomerId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch customerId here
     const fetchCustomerId = async () => {
       try {
-        // Assuming the customerId is available via an API or context
         const response = await fetch("/api/user/customerId");
         const data = await response.json();
         setCustomerId(data.customerId);
@@ -45,7 +43,7 @@ const InvestorDashboard: React.FC = () => {
         }
       } catch (err) {
         if (err instanceof Error) {
-          setError(err.message); // Safely access the error message
+          setError(err.message);
         } else {
           setError("An unexpected error occurred");
         }

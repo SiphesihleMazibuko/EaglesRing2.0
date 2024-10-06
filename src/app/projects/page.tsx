@@ -16,6 +16,8 @@ import Image from "next/image";
 import Loader from "@/components/ui/Loader";
 
 interface Pitch {
+  isInvested: boolean;
+  investorId: string;
   projectImage: string;
   _id: string;
   entrepreneurId: string;
@@ -35,14 +37,21 @@ const Page = () => {
   const [sortOrder, setSortOrder] = useState<string>("newest");
   const [expandedPitchStates, setExpandedPitchStates] = useState<{
     [key: string]: boolean;
-  }>({}); // Track expanded states for each pitch
+  }>({});
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const fetchPitches = async () => {
       try {
         const response = await fetch("/api/getProject");
         const data = await response.json();
-        setPitches(data);
+
+        const filteredPitches = data.filter(
+          (pitch: Pitch) =>
+            !pitch.isInvested || pitch.investorId === session?.user?.id
+        );
+
+        setPitches(filteredPitches);
       } catch (error) {
         console.error("Error fetching pitches:", error);
       }
@@ -54,12 +63,15 @@ const Page = () => {
   const toggleReadMore = (id: string) => {
     setExpandedPitchStates((prevStates) => ({
       ...prevStates,
-      [id]: !prevStates[id], // Toggle the specific pitch state
+      [id]: !prevStates[id],
     }));
   };
 
   const filteredPitches = pitches
     .filter((pitch) => {
+      if (pitch.isInvested && pitch.investorId !== session?.user?.id) {
+        return false;
+      }
       if (!selectedPhase) return true;
       return pitch.businessPhase === selectedPhase;
     })
@@ -93,7 +105,6 @@ const Page = () => {
       const data = await response.json();
 
       if (data.url) {
-        // Redirect to the Stripe Checkout URL returned by the API
         window.location.href = data.url;
       } else {
         console.error("No session URL returned from Stripe");
@@ -122,7 +133,6 @@ const Page = () => {
         </div>
 
         <div className="flex justify-between gap-4">
-          {/* Filter by Business Phase */}
           <div className="w-1/2">
             <Select onValueChange={(value) => setSelectedPhase(value)}>
               <SelectTrigger
@@ -132,65 +142,26 @@ const Page = () => {
                 <SelectValue placeholder="Filter by Business Phase" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem
-                  value="Initial Phase"
-                  className="bg-card text-card-foreground"
-                >
-                  Initial Phase
-                </SelectItem>
-                <SelectItem
-                  value="Startup Phase"
-                  className="bg-card text-card-foreground"
-                >
-                  Startup Phase
-                </SelectItem>
-                <SelectItem
-                  value="Growth Phase"
-                  className="bg-card text-card-foreground"
-                >
-                  Growth Phase
-                </SelectItem>
-                <SelectItem
-                  value="Maturity Phase"
-                  className="bg-card text-card-foreground"
-                >
-                  Maturity Phase
-                </SelectItem>
-                <SelectItem
-                  value="Expansion Phase"
-                  className="bg-card text-card-foreground"
-                >
-                  Expansion Phase
-                </SelectItem>
-                <SelectItem
-                  value="Decline Phase"
-                  className="bg-card text-card-foreground"
-                >
+                <SelectItem value="Initial Phase">Initial Phase</SelectItem>
+                <SelectItem value="Startup Phase">Startup Phase</SelectItem>
+                <SelectItem value="Growth Phase">Growth Phase</SelectItem>
+                <SelectItem value="Maturity Phase">Maturity Phase</SelectItem>
+                <SelectItem value="Expansion Phase">Expansion Phase</SelectItem>
+                <SelectItem value="Decline Phase">
                   Decline/Renewal Phase
                 </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Sort by Date */}
           <div className="w-1/2">
             <Select onValueChange={(value) => setSortOrder(value)}>
               <SelectTrigger aria-label="Sort by Date">
                 <SelectValue placeholder="Sort by Date" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem
-                  value="newest"
-                  className="bg-card text-card-foreground"
-                >
-                  Newest
-                </SelectItem>
-                <SelectItem
-                  value="oldest"
-                  className="bg-card text-card-foreground"
-                >
-                  Oldest
-                </SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -209,7 +180,7 @@ const Page = () => {
                 day: "2-digit",
               });
 
-              const isExpanded = expandedPitchStates[pitch._id] || false; // Check if the pitch is expanded
+              const isExpanded = expandedPitchStates[pitch._id] || false;
 
               return (
                 <Card
@@ -222,7 +193,6 @@ const Page = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        {/* Display pitch image as an icon */}
                         <Image
                           src={pitch.projectImage}
                           alt={`${pitch.companyName} logo`}
@@ -231,7 +201,6 @@ const Page = () => {
                           className="w-12 h-12 object-cover rounded-badge"
                         />
                         <div>
-                          {/* Company name, business phase, and created date */}
                           <h4 className="text-sm font-medium">
                             {pitch.companyName}
                           </h4>
@@ -244,8 +213,6 @@ const Page = () => {
                           <p className="text-xs text-muted-foreground">
                             {pitch.entrepreneurEmail}
                           </p>
-
-                          {/* Display the investment amount */}
                           <p className="text-sm font-semibold text-neutral-950">
                             Amount requested for: R{pitch.investmentAmount}
                           </p>
@@ -257,7 +224,6 @@ const Page = () => {
                     </div>
                   </div>
 
-                  {/* Hidden content: video and project idea */}
                   {isExpanded && (
                     <div className="p-4">
                       <div className="flex flex-col gap-2">
@@ -270,11 +236,9 @@ const Page = () => {
                           <source src={pitch.pitchVideo} type="video/mp4" />
                           Your browser does not support the video tag.
                         </video>
-
                         <p className="text-sm text-muted-foreground mt-2">
                           {pitch.projectIdea}
                         </p>
-
                         <Button
                           onClick={() =>
                             handleInvest(
@@ -284,12 +248,18 @@ const Page = () => {
                               pitch.companyName
                             )
                           }
-                          disabled={loading}
+                          disabled={loading || pitch.isInvested}
                           variant="secondary"
                           size="sm"
                           className="font-bold text-sm py-2 px-5 mt-4 rounded-lg cursor-pointer hover:scale-105 bg-gradient-to-r from-[#917953] to-[#CBAC7C]"
                         >
-                          {loading ? <Loader /> : "Invest"}
+                          {loading ? (
+                            <Loader />
+                          ) : pitch.isInvested ? (
+                            "Already Invested"
+                          ) : (
+                            "Invest"
+                          )}
                         </Button>
                       </div>
                     </div>

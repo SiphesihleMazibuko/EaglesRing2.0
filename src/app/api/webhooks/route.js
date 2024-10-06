@@ -4,10 +4,9 @@ import User from '@/models/user';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// This replaces the old 'export const config' and tells Next.js this API route is dynamic
 export const dynamic = 'force-dynamic';
 
-// Function to read raw body for Stripe webhook signature verification
+
 async function readRawBody(req) {
   const chunks = [];
   const reader = req.body.getReader();
@@ -32,13 +31,12 @@ export async function POST(req) {
       process.env.STRIPE_WEBHOOK_SECRET
     );
 
-    // Connect to the database
+
     await connectToDatabase();
 
-    // Log the event type for debugging
     console.log(`Received event: ${event.type}`);
 
-    // Handle event types
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
@@ -46,7 +44,6 @@ export async function POST(req) {
         console.log('Subscription ID:', session.subscription);
 
         if (session.customer_email && session.subscription) {
-          // Find the user by email and update their subscription status
           const user = await User.findOneAndUpdate(
             { email: session.customer_email },
             {
@@ -69,7 +66,6 @@ export async function POST(req) {
         console.log('Invoice was paid:', invoice);
 
         if (invoice.customer_email) {
-          // Mark the invoice as paid for the user
           await User.findOneAndUpdate(
             { email: invoice.customer_email },
             {
@@ -91,7 +87,6 @@ export async function POST(req) {
         console.log('Subscription created:', subscription);
 
         if (subscription.customer_email && subscription.id) {
-          // Update the user's subscription details
           await User.findOneAndUpdate(
             { email: subscription.customer_email },
             {
@@ -114,7 +109,6 @@ export async function POST(req) {
         console.log('Subscription updated:', updatedSubscription);
 
         if (updatedSubscription.customer_email && updatedSubscription.id) {
-          // Update the subscription status in the user's profile
           await User.findOneAndUpdate(
             { email: updatedSubscription.customer_email },
             {
@@ -136,7 +130,6 @@ export async function POST(req) {
         console.log('Charge succeeded:', charge);
 
         if (charge.billing_details && charge.billing_details.email) {
-          // Log or store the charge details
           await User.findOneAndUpdate(
             { email: charge.billing_details.email },
             {
@@ -155,7 +148,6 @@ export async function POST(req) {
         console.log('Payment intent succeeded:', paymentIntent);
 
         if (paymentIntent.receipt_email) {
-          // Optionally, you could record successful payment intents in your system
           await User.findOneAndUpdate(
             { email: paymentIntent.receipt_email },
             {
@@ -169,7 +161,6 @@ export async function POST(req) {
         break;
       }
 
-      // Additional events to handle
       case 'payment_intent.created': {
         console.log('Payment intent created:', event.data.object);
         break;
@@ -190,7 +181,6 @@ export async function POST(req) {
         console.log('Customer created:', customer);
 
         if (customer.email) {
-          // Optionally create a user in the database if not present
           await User.findOneAndUpdate(
             { email: customer.email },
             {
@@ -200,7 +190,7 @@ export async function POST(req) {
                 country: customer.address.country,
               },
             },
-            { upsert: true } // Creates a new user if one doesn't exist
+            { upsert: true }
           );
           console.log('User created or updated:', customer.email);
         } else {
@@ -214,7 +204,6 @@ export async function POST(req) {
         console.log('Customer updated:', updatedCustomer);
 
         if (updatedCustomer.email) {
-          // Update customer details in the database
           await User.findOneAndUpdate(
             { email: updatedCustomer.email },
             {

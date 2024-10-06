@@ -11,24 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSession, signIn, signOut } from "next-auth/react"; // Import session functions
+import { useSession, signIn, signOut } from "next-auth/react";
 import InvestorNavbar from "../investornavbar/page";
 import Navbar from "../navbar/page";
 import DashboardPage from "../dashboard/page";
 import Loader from "@/components/ui/Loader";
 import InvestorDashboard from "../investorDashboard/page";
-
-interface Notification {
-  _id: string;
-  investorId: {
-    fullName: string;
-  };
-  pitchId: {
-    companyName: string;
-  } | null;
-  status: string;
-  createdAt: string;
-}
 
 interface SubscriptionInfo {
   status: string;
@@ -39,7 +27,6 @@ export function Profile() {
   const { data: session, update: updateSession } = useSession();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [subscriptionInfo, setSubscriptionInfo] =
     useState<SubscriptionInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,23 +37,6 @@ export function Profile() {
       setEmail(session.user.email || "");
       setFullName(session.user.name || "");
     }
-
-    const fetchNotifications = async () => {
-      try {
-        const response = await fetch(
-          `/api/getNotifications?entrepreneurId=${session?.user?.id}`
-        );
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setNotifications(data);
-        } else {
-          setNotifications([]);
-        }
-      } catch (error) {
-        console.error("Error fetching notifications:", error);
-        setNotifications([]);
-      }
-    };
 
     const fetchSubscriptionDetails = async () => {
       try {
@@ -90,41 +60,9 @@ export function Profile() {
     };
 
     if (session?.user?.userType === "Entrepreneur") {
-      fetchNotifications();
       fetchSubscriptionDetails();
     }
   }, [session]);
-
-  const handleResponse = async (notificationId: string, status: string) => {
-    try {
-      const response = await fetch(`/api/updateNotificationStatus`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          notificationId,
-          status,
-        }),
-      });
-
-      if (response.ok) {
-        toast.success(`Notification ${status}!`);
-        setNotifications((prevNotifications) =>
-          prevNotifications.map((notification) =>
-            notification._id === notificationId
-              ? { ...notification, status }
-              : notification
-          )
-        );
-      } else {
-        toast.error("Failed to update notification.");
-      }
-    } catch (error) {
-      console.error("Error updating notification:", error);
-      toast.error("An error occurred.");
-    }
-  };
 
   const handleProfileUpdate = async () => {
     setIsLoading(true);
@@ -143,7 +81,6 @@ export function Profile() {
       if (response.ok) {
         toast.success("Profile updated successfully!");
 
-        // Update session with new email and full name
         await updateSession({
           user: {
             ...session?.user,
@@ -173,7 +110,7 @@ export function Profile() {
 
       if (response.ok) {
         toast.success("Subscription canceled successfully.");
-        setSubscriptionInfo(null); // Clear subscription info
+        setSubscriptionInfo(null);
       } else {
         toast.error("Failed to cancel subscription.");
       }
@@ -185,7 +122,7 @@ export function Profile() {
     }
   };
 
-  const customerId = session?.user?.stripeCustomerId || ""; // Fallback to an empty string
+  const customerId = session?.user?.stripeCustomerId || "";
 
   return (
     <div className="background-container min-h-screen flex-1">
@@ -262,51 +199,6 @@ export function Profile() {
               {isLoading ? <Loader /> : "Update Profile"}
             </Button>
           </CardContent>
-          <CardFooter>
-            <div className="w-full">
-              <h3 className="text-lg font-bold">Notifications</h3>
-              {notifications.length === 0 ? (
-                <p>No notifications available.</p>
-              ) : (
-                <ul className="list-disc pl-5">
-                  {notifications.map((notification) => (
-                    <li key={notification._id} className="py-1">
-                      {notification?.investorId?.fullName} wants to connect to
-                      view your pitch &quot;
-                      {notification?.pitchId?.companyName || "Unknown Pitch"}
-                      &quot;. Status:{" "}
-                      <span className="font-bold text-accent">
-                        {notification.status}
-                      </span>
-                      <div className="mt-2">
-                        {notification.status === "pending" && (
-                          <>
-                            <Button
-                              variant="default"
-                              className="mr-2"
-                              onClick={() =>
-                                handleResponse(notification._id, "accepted")
-                              }
-                            >
-                              Accept
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              onClick={() =>
-                                handleResponse(notification._id, "declined")
-                              }
-                            >
-                              Decline
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </CardFooter>
         </Card>
       </div>
       <div className="flex flex-col items-center justify-center flex-grow py-10">

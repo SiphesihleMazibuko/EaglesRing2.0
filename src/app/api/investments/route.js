@@ -18,7 +18,6 @@ export async function POST(req) {
     const body = await req.json();
     const { amount, entrepreneurEmail, companyName } = body;
 
-    // Get the session and check if the investor email exists
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user?.email) {
@@ -30,42 +29,37 @@ export async function POST(req) {
     await connectMongoDB();
 
     const investor = await User.findOne({ email: investorEmail });
-    console.log('Investor found:', investor); // Debugging
+    console.log('Investor found:', investor); 
 
     if (!investor || !investor.mentorFullName || !investor.mentorEmail) {
       return new Response(JSON.stringify({ error: 'Mentor details not found for this investor' }), { status: 404 });
     }
 
-    // Check if the investor already has a Stripe customer ID
     let customerId = investor.stripeCustomerId;
 
     if (!customerId) {
-      // Create a new Stripe customer if none exists
       const customer = await stripe.customers.create({
         email: investorEmail,
-        name: `${investor.fullName}`, // Assuming you store investor's name in the DB
+        name: `${investor.fullName}`, 
       });
 
-      console.log('Stripe customer created:', customer.id); // Debugging
+      console.log('Stripe customer created:', customer.id);
 
-      // Update the MongoDB database with the new Stripe customer ID
       investor.stripeCustomerId = customer.id;
 
-      // Save the updated investor object
       try {
         await investor.save();
-        console.log('Investor updated with customerId:', investor.stripeCustomerId); // Debugging
+        console.log('Investor updated with customerId:', investor.stripeCustomerId); 
       } catch (error) {
-        console.error('Error saving investor:', error); // Debugging save error
+        console.error('Error saving investor:', error);
         return new Response(JSON.stringify({ error: 'Failed to save customerId in database' }), { status: 500 });
       }
 
       customerId = customer.id;
     }
 
-    // Create the Stripe Checkout session
     const stripeSession = await stripe.checkout.sessions.create({
-      customer: customerId, // Attach the Stripe customer ID here
+      customer: customerId, 
       payment_method_types: ['card'],
       line_items: [
         {
@@ -74,7 +68,7 @@ export async function POST(req) {
             product_data: {
               name: `Investment for Pitch: ${companyName}`,
             },
-            unit_amount: amount * 100, // Convert amount to cents for Stripe
+            unit_amount: amount * 100, 
           },
           quantity: 1,
         },
@@ -88,10 +82,9 @@ export async function POST(req) {
       },
     });
 
-    // Send email notification to the entrepreneur
     await sendEmailNotification(entrepreneurEmail, amount, investorEmail, companyName, investor.mentorFullName, investor.mentorEmail);
 
-    // Return the session URL as a response for redirecting
+
     return new Response(JSON.stringify({ url: stripeSession.url }), { status: 200 });
   } catch (error) {
     console.error('Error during payment session creation:', error);
@@ -99,7 +92,6 @@ export async function POST(req) {
   }
 }
 
-// Helper function to send email notifications
 async function sendEmailNotification(entrepreneurEmail, amount, investorEmail, companyName, mentorFullName, mentorEmail) {
   if (!entrepreneurEmail) {
     throw new Error("No recipient email provided");
@@ -108,11 +100,11 @@ async function sendEmailNotification(entrepreneurEmail, amount, investorEmail, c
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER, // Your email credentials
-      pass: process.env.EMAIL_PASSWORD, // Your email password
+      user: process.env.EMAIL_USER, 
+      pass: process.env.EMAIL_PASSWORD, 
     },
     tls: {
-      rejectUnauthorized: false, // Accept self-signed certificates
+      rejectUnauthorized: false, 
     },
   });
 
@@ -124,7 +116,6 @@ async function sendEmailNotification(entrepreneurEmail, amount, investorEmail, c
   };
 
   try {
-    // Send the email
     await transporter.sendMail(mailOptions);
     console.log('Email sent successfully.');
   } catch (error) {

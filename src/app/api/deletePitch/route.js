@@ -2,14 +2,13 @@ import { getServerSession } from "next-auth";
 import authOptions from "@/lib/authOptions";
 import dbConnect from "@/lib/mongodb";
 import Pitch from "@/models/pitch";
-import { NextResponse } from "next/server"; // Import NextResponse for response handling
+import { NextResponse } from "next/server"; 
 
-// Named export for the DELETE method
+
 export async function DELETE(req) {
   try {
     console.log("DELETE request received");
 
-    // Use getServerSession and pass the authOptions correctly
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -21,7 +20,7 @@ export async function DELETE(req) {
     console.log("Pitch ID to be deleted:", pitchId);
 
     await dbConnect();
-    const entrepreneurId = session.user.id; // Assuming you have user ID in session
+    const entrepreneurId = session.user.id; 
 
     console.log("Checking ownership for entrepreneurId:", entrepreneurId);
     const pitch = await Pitch.findOne({ _id: pitchId, entrepreneurId });

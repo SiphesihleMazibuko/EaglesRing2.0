@@ -10,27 +10,25 @@ export async function POST(req) {
       });
     }
 
-    // Create a Nodemailer transporter using your email credentials
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // or any email service you use (e.g., Gmail, SMTP)
+      service: 'gmail', 
       auth: {
-        user: process.env.EMAIL_USER, // Add your email address in environment variables
-        pass: process.env.EMAIL_PASSWORD, // Add your email password or app-specific password in environment variables
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASSWORD, 
       },
       tls:{
         rejectUnauthorized: false,
       }
     });
 
-    // Email options
     const mailOptions = {
-      from: email, // Sender email
-      to: 'ecotracker407@gmail.com', // Your company email
+      from: email, 
+      to: 'ecotracker407@gmail.com', 
       subject: `New Contact Form Submission from ${firstName} ${lastName}`,
       text: `You have received a new message from ${firstName} ${lastName} (${email}):\n\n${message}`,
     };
 
-    // Send the email
+
     await transporter.sendMail(mailOptions);
 
     return new Response(JSON.stringify({ message: "Message sent successfully!" }), {
