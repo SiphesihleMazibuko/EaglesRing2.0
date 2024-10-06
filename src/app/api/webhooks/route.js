@@ -4,16 +4,19 @@ import User from '@/models/user';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export const config = {
-  api: {
-    bodyParser: false, // Stripe requires the raw body for signature verification
-  },
-};
+// This replaces the old 'export const config' and tells Next.js this API route is dynamic
+export const dynamic = 'force-dynamic';
 
+// Function to read raw body for Stripe webhook signature verification
 async function readRawBody(req) {
   const chunks = [];
-  for await (const chunk of req.body) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  const reader = req.body.getReader();
+  let done, value;
+  while (!done) {
+    ({ done, value } = await reader.read());
+    if (value) {
+      chunks.push(value);
+    }
   }
   return Buffer.concat(chunks);
 }
