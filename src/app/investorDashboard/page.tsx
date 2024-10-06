@@ -4,20 +4,34 @@ import Spinner from "@/components/ui/Spinner";
 import { MessageSquare } from "lucide-react";
 import React, { useState, useEffect } from "react";
 
-interface InvestorDashboardProps {
-  customerId: string;
-}
-
-const InvestorDashboard: React.FC<InvestorDashboardProps> = ({
-  customerId,
-}) => {
+const InvestorDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [investmentCount, setInvestmentCount] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+  const [customerId, setCustomerId] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("Customer ID:", customerId); // Verify if customerId is being passed
+    // Fetch customerId here
+    const fetchCustomerId = async () => {
+      try {
+        // Assuming the customerId is available via an API or context
+        const response = await fetch("/api/user/customerId");
+        const data = await response.json();
+        setCustomerId(data.customerId);
+      } catch (err) {
+        console.error("Error fetching customerId", err);
+        setError("Failed to load customer ID.");
+      }
+    };
+
+    fetchCustomerId();
+  }, []);
+
+  useEffect(() => {
+    if (!customerId) return;
+
     const fetchInvestmentCount = async () => {
+      setLoading(true);
       try {
         const response = await fetch(
           `/api/investments?customerId=${customerId}`

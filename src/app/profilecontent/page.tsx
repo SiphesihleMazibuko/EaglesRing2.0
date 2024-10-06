@@ -311,7 +311,7 @@ export function Profile() {
       </div>
       <div className="flex flex-col items-center justify-center flex-grow py-10">
         {session?.user?.userType === "Investor" ? (
-          <InvestorDashboard customerId={customerId} />
+          <InvestorDashboard />
         ) : (
           <DashboardPage />
         )}
