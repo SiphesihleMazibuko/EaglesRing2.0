@@ -29,6 +29,7 @@ interface Project {
   projectImage: string | null;
   investmentAmount: string;
   createdAt: string;
+  entrepreneurName: string;
 }
 
 interface PitchState {
@@ -61,7 +62,14 @@ function PostProject() {
         const response = await fetch("/api/getEntrepreneurProject");
         if (response.ok) {
           const data = await response.json();
-          setUserProjects(data);
+
+          // Sort projects by createdAt (newest first)
+          const sortedProjects = data.sort(
+            (a: Project, b: Project) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+
+          setUserProjects(sortedProjects);
         } else {
           toast.error("Error fetching projects");
         }

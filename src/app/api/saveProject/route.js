@@ -85,6 +85,7 @@ export async function POST(req) {
     const newPitch = new Pitch({
       entrepreneurId: user._id,
       entrepreneurEmail: session.user.email,
+      entrepreneurName: session.user.name,
       companyName,
       projectIdea,
       businessPhase,

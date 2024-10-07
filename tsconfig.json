@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext","es2015"],
-      "target": "es2015",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext",
+      "es2015"
+    ],
+    "target": "es2015",
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -13,14 +18,20 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "types": [
+      "stripe-v3",
+      "node"
+    ], // Ensure "node" is here
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
     "plugins": [
       {
         "name": "next"
       }
-    ],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    ]
   },
   "include": [
     "next-env.d.ts",
@@ -29,7 +40,13 @@
     ".next/types/**/*.ts",
     "src/app/api/update-profile.js",
     "middleware.js",
-    "types"
-, "src/app/checkout/page.js", "src/app/api/updateProfile/route.js", "src/app/api/checkout/route.js", "src/app/api/subscription-status/route.js"  ],
-  "exclude": ["node_modules"]
+    "types",
+    "src/app/checkout/page.js",
+    "src/app/api/updateProfile/route.js",
+    "src/app/api/checkout/route.js",
+    "src/app/api/subscription-status/route.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

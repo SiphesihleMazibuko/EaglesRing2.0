@@ -28,6 +28,7 @@ interface Pitch {
   investmentAmount: string;
   businessPhase: string;
   createdAt: string;
+  entrepreneurName: string;
 }
 
 const Page = () => {
@@ -45,6 +46,7 @@ const Page = () => {
       try {
         const response = await fetch("/api/getProject");
         const data = await response.json();
+        console.log(data);
 
         const filteredPitches = data.filter(
           (pitch: Pitch) =>
@@ -85,7 +87,8 @@ const Page = () => {
     pitchId: string,
     amount: number,
     entrepreneurEmail: string,
-    companyName: string
+    companyName: string,
+    entrepreneurName: string
   ) => {
     try {
       setLoading(true);
@@ -99,6 +102,7 @@ const Page = () => {
           entrepreneurEmail,
           pitchId,
           companyName,
+          entrepreneurName,
         }),
       });
 
@@ -134,7 +138,11 @@ const Page = () => {
 
         <div className="flex justify-between gap-4">
           <div className="w-1/2">
-            <Select onValueChange={(value) => setSelectedPhase(value)}>
+            <Select
+              onValueChange={(value: React.SetStateAction<string>) =>
+                setSelectedPhase(value)
+              }
+            >
               <SelectTrigger
                 aria-label="Filter by Business Phase"
                 className="bg-card text-card-foreground"
@@ -155,7 +163,11 @@ const Page = () => {
           </div>
 
           <div className="w-1/2">
-            <Select onValueChange={(value) => setSortOrder(value)}>
+            <Select
+              onValueChange={(value: React.SetStateAction<string>) =>
+                setSortOrder(value)
+              }
+            >
               <SelectTrigger aria-label="Sort by Date">
                 <SelectValue placeholder="Sort by Date" />
               </SelectTrigger>
@@ -245,7 +257,8 @@ const Page = () => {
                               pitch._id,
                               parseInt(pitch.investmentAmount),
                               pitch.entrepreneurEmail,
-                              pitch.companyName
+                              pitch.companyName,
+                              pitch.entrepreneurName
                             )
                           }
                           disabled={loading || pitch.isInvested}

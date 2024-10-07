@@ -8,6 +8,10 @@ const pitchSchema = new Schema(
       ref: 'User',
       required: true,
     },
+    entrepreneurName: {
+      type: String,
+      required: true,
+    },
    entrepreneurEmail: {
       type: String,  
       required: true,
