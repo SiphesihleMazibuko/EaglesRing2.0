@@ -19,6 +19,7 @@ import Loader from "@/components/ui/Loader";
 import { Label } from "@radix-ui/react-label";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 export default function Component() {
   const [fullName, setFullName] = useState("");
@@ -374,8 +375,11 @@ export default function Component() {
               id="terms"
               name="termsAccepted"
               checked={termsAccepted}
-              onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+              onCheckedChange={(checked: CheckedState) =>
+                setTermsAccepted(checked === true)
+              }
             />
+
             <label
               htmlFor="terms"
               className="text-sm font-medium leading-none text-card-foreground"
